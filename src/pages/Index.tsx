@@ -1,31 +1,42 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Sparkles, ChevronRight } from "lucide-react";
-import { toast } from "sonner";
+import { Sparkles, PenLine, Brain, ChevronRight } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
-import { getEntries, generatePreview, saveEntry } from "@/lib/store";
+import { getEntries } from "@/lib/store";
+import { getDueReviews } from "@/lib/review";
 import cuteBear from "@/assets/cute-bear.png";
 
 const Index = () => {
-  const [url, setUrl] = useState("");
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const recent = getEntries().slice(0, 5);
+  const entries = getEntries();
+  const dueCount = getDueReviews().length;
+  const notesCount = entries.filter((e) => e.notes).length;
 
-  const handleGenerate = async () => {
-    if (!url.trim()) return;
-    setLoading(true);
-    try {
-      const entry = await generatePreview(url);
-      saveEntry(entry);
-      navigate(`/preview/${entry.id}`);
-    } catch (err) {
-      console.error(err);
-      toast.error(err instanceof Error ? err.message : "生成失败，请重试");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const actions = [
+    {
+      icon: Sparkles,
+      label: "AI 预习",
+      desc: "粘贴链接，快速了解播客内容",
+      path: "/ai-preview",
+      color: "bg-primary/10 text-primary",
+    },
+    {
+      icon: PenLine,
+      label: "我的笔记",
+      desc: `${notesCount} 篇笔记`,
+      path: "/notes-list",
+      color: "bg-accent/15 text-accent-foreground",
+    },
+    {
+      icon: Brain,
+      label: "复习",
+      desc: dueCount > 0 ? `${dueCount} 篇待复习` : "暂无待复习",
+      path: "/review",
+      color: "bg-destructive/10 text-destructive",
+      badge: dueCount > 0 ? dueCount : undefined,
+    },
+  ];
+
+  const recent = entries.slice(0, 3);
 
   return (
     <div className="min-h-screen bg-background pb-20 relative overflow-hidden">
@@ -33,8 +44,6 @@ const Index = () => {
       <div className="absolute -top-12 -right-12 w-40 h-40 rounded-full bg-primary/15" />
       <div className="absolute top-6 -right-4 w-20 h-20 rounded-full bg-accent/20" />
       <div className="absolute top-64 -left-10 w-28 h-28 rounded-full bg-primary/10" />
-      <div className="absolute bottom-48 right-6 w-14 h-14 rounded-full bg-accent/15" />
-      <div className="absolute bottom-72 -left-6 w-10 h-10 rounded-full bg-primary/20" />
 
       {/* Header */}
       <div className="relative px-6 pt-10 pb-4">
@@ -47,33 +56,30 @@ const Index = () => {
         </div>
       </div>
 
-      {/* Input Section */}
-      <div className="px-6 mb-8">
-        <div className="bg-card rounded-2xl p-5 border border-border shadow-sm">
-          <label className="text-sm font-semibold text-foreground mb-3 block">
-            粘贴播客链接
-          </label>
-          <input
-            type="url"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            placeholder="https://podcast.example.com/ep-01"
-            className="w-full bg-surface text-foreground rounded-xl px-4 py-3.5 text-sm outline-none ring-1 ring-border focus:ring-2 focus:ring-primary transition-all placeholder:text-muted-foreground"
-          />
-          <button
-            onClick={handleGenerate}
-            disabled={!url.trim() || loading}
-            className="mt-4 w-full bg-primary text-primary-foreground font-display font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed shadow-md shadow-primary/20"
-          >
-            {loading ? (
-              <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-            ) : (
-              <>
-                <Sparkles size={18} />
-                生成预习
-              </>
-            )}
-          </button>
+      {/* Quick Actions */}
+      <div className="px-6 mb-6">
+        <div className="space-y-3">
+          {actions.map(({ icon: Icon, label, desc, path, color, badge }) => (
+            <button
+              key={path}
+              onClick={() => navigate(path)}
+              className="w-full bg-card border border-border rounded-2xl px-4 py-4 flex items-center gap-4 text-left transition-all hover:shadow-md hover:border-primary/20"
+            >
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${color}`}>
+                <Icon size={20} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-bold text-sm">{label}</p>
+                <p className="text-xs text-muted-foreground">{desc}</p>
+              </div>
+              {badge && (
+                <span className="bg-destructive text-destructive-foreground text-xs font-bold px-2 py-0.5 rounded-full">
+                  {badge}
+                </span>
+              )}
+              <ChevronRight size={16} className="text-muted-foreground shrink-0" />
+            </button>
+          ))}
         </div>
       </div>
 

@@ -1,4 +1,4 @@
-import { Home, Clock } from "lucide-react";
+import { Home, Sparkles, PenLine, Brain } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const BottomNav = () => {
@@ -7,7 +7,9 @@ const BottomNav = () => {
 
   const tabs = [
     { path: "/", icon: Home, label: "首页" },
-    { path: "/history", icon: Clock, label: "历史" },
+    { path: "/ai-preview", icon: Sparkles, label: "AI预习" },
+    { path: "/notes-list", icon: PenLine, label: "笔记" },
+    { path: "/review", icon: Brain, label: "复习" },
   ];
 
   return (
