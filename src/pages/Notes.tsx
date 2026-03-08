@@ -87,6 +87,7 @@ const Notes = () => {
     const updatedEntry = {
       ...entry,
       showName: showName.trim() || entry.showName,
+      category: category || undefined,
       notes: {
         topic,
         keyPoints: keyPoints.split("\n").filter((p) => p.trim()),
