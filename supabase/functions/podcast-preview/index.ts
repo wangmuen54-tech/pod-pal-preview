@@ -183,7 +183,7 @@ ${pageContent.slice(0, 8000)}`
                     description: '延伸阅读/推荐资源（2-4个）',
                   },
                 },
-                required: ['title', 'brief', 'background', 'listenGuide', 'keyPeople', 'keyConcepts', 'keyEvents', 'controversies', 'relatedResources'],
+                required: ['title', 'showName', 'brief', 'background', 'listenGuide', 'keyPeople', 'keyConcepts', 'keyEvents', 'controversies', 'relatedResources'],
                 additionalProperties: false,
               },
             },
