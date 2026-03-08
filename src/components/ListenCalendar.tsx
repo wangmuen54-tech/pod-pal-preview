@@ -115,7 +115,7 @@ const ListenCalendar = () => {
       {/* Days Grid */}
       <div className="grid grid-cols-7 gap-0.5">
         {Array.from({ length: startPadding }).map((_, i) => (
-          <div key={`pad-${i}`} className="aspect-square" />
+          <div key={`pad-${i}`} className="h-7" />
         ))}
         {days.map((day) => {
           const key = format(day, "yyyy-MM-dd");
