@@ -201,7 +201,7 @@ const ListenCalendar = () => {
           <p className="text-[10px] text-muted-foreground">总时长</p>
         </div>
         <div className="flex-1 bg-muted rounded-lg p-2 text-center">
-          <CalendarDays size={16} className="mx-auto text-primary mb-1" />
+          <CalendarDays size={14} className="mx-auto text-primary mb-0.5" />
           {editingStats ? (
             <input
               type="number"
