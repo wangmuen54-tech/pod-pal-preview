@@ -15,6 +15,7 @@ const Index = () => {
 
   useEffect(() => {
     fetchEntries().then(setEntries);
+    getDueReviews().then((items) => setDueCount(items.length));
   }, []);
 
   const notesCount = entries.filter((e) => e.notes).length;
