@@ -28,7 +28,12 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background pb-20 relative overflow-hidden">
+      {/* Decorative background blobs */}
+      <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-primary/10 blur-3xl" />
+      <div className="absolute top-40 -left-32 w-72 h-72 rounded-full bg-accent/15 blur-3xl" />
+      <div className="absolute bottom-32 right-0 w-48 h-48 rounded-full bg-primary/8 blur-2xl" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 w-56 h-56 rounded-full bg-secondary/20 blur-3xl" />
       {/* Header */}
       <div className="px-6 pt-10 pb-4">
         <div className="flex items-center gap-3 mb-1">
