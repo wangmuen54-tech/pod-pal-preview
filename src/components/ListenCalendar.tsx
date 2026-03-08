@@ -81,7 +81,8 @@ const ListenCalendar = () => {
 
   const handleStartEditStats = () => {
     const s = getEffectiveStats();
-    setEditTotalMinutes(s.totalMinutes);
+    setEditH(Math.floor(s.totalMinutes / 60));
+    setEditM(s.totalMinutes % 60);
     setEditTotalDays(s.totalDays);
     setEditingStats(true);
   };
