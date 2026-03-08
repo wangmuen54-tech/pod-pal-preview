@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Save, Copy, Share2 } from "lucide-react";
-import { getEntry, saveEntry, type PodcastEntry } from "@/lib/store";
+import { getEntry, saveEntry, CATEGORIES, type PodcastEntry, type PodcastCategory } from "@/lib/store";
 import { upsertReviewItem } from "@/lib/review";
 import StarRating from "@/components/StarRating";
 import { toast } from "sonner";
