@@ -24,8 +24,10 @@ const SectionCard = ({
   return (
     <div className="mb-5">
       <div className="flex items-center gap-2 mb-2 px-1">
-        <Icon size={16} className="text-primary" />
-        <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+        <div className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center">
+          <Icon size={14} className="text-primary" />
+        </div>
+        <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
           {title}
         </h3>
       </div>
@@ -34,10 +36,10 @@ const SectionCard = ({
           <button
             key={item.name}
             onClick={() => setExpanded(expanded === item.name ? null : item.name)}
-            className="w-full bg-card border border-border rounded-xl px-4 py-3 text-left transition-all hover:border-primary/30"
+            className="w-full bg-card border border-border rounded-2xl px-4 py-3 text-left transition-all hover:shadow-sm hover:border-primary/20"
           >
             <div className="flex items-center justify-between">
-              <span className="font-medium text-sm">{item.name}</span>
+              <span className="font-semibold text-sm">{item.name}</span>
               {expanded === item.name ? (
                 <ChevronUp size={16} className="text-muted-foreground" />
               ) : (
@@ -105,28 +107,30 @@ const Preview = () => {
       {/* Header */}
       <div className="sticky top-0 bg-background/80 backdrop-blur-xl border-b border-border z-10">
         <div className="flex items-center justify-between px-4 py-3">
-          <button onClick={() => navigate(-1)} className="text-muted-foreground hover:text-foreground transition-colors">
-            <ArrowLeft size={20} />
+          <button onClick={() => navigate(-1)} className="w-8 h-8 rounded-xl bg-card border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
+            <ArrowLeft size={18} />
           </button>
-          <span className="text-sm font-semibold text-muted-foreground">预习</span>
-          <button onClick={handleCopyPreview} className="text-muted-foreground hover:text-foreground transition-colors">
-            <Copy size={18} />
+          <span className="text-sm font-bold text-foreground">预习</span>
+          <button onClick={handleCopyPreview} className="w-8 h-8 rounded-xl bg-card border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
+            <Copy size={16} />
           </button>
         </div>
       </div>
 
       <div className="px-6 pt-6">
-        <h1 className="text-xl font-display font-bold mb-5">{entry.title}</h1>
+        <h1 className="text-xl font-display font-extrabold mb-5">{entry.title}</h1>
 
         {/* 30s Brief */}
         <div className="mb-5">
           <div className="flex items-center gap-2 mb-2 px-1">
-            <Info size={16} className="text-primary" />
-            <p className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+            <div className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Info size={14} className="text-primary" />
+            </div>
+            <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
               30秒速览
             </p>
           </div>
-          <div className="bg-card border border-border rounded-xl p-4">
+          <div className="bg-card border border-border rounded-2xl p-4 shadow-sm">
             <p className="text-sm leading-relaxed text-surface-foreground">
               {entry.brief}
             </p>
@@ -137,12 +141,14 @@ const Preview = () => {
         {entry.background && (
           <div className="mb-5">
             <div className="flex items-center gap-2 mb-2 px-1">
-              <BookOpen size={16} className="text-primary" />
-              <p className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+              <div className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center">
+                <BookOpen size={14} className="text-primary" />
+              </div>
+              <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
                 背景知识
               </p>
             </div>
-            <div className="bg-card border border-border rounded-xl p-4">
+            <div className="bg-card border border-border rounded-2xl p-4 shadow-sm">
               <p className="text-sm leading-relaxed text-surface-foreground">
                 {entry.background}
               </p>
@@ -154,15 +160,17 @@ const Preview = () => {
         {entry.listenGuide && entry.listenGuide.length > 0 && (
           <div className="mb-5">
             <div className="flex items-center gap-2 mb-2 px-1">
-              <HelpCircle size={16} className="text-primary" />
-              <p className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+              <div className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center">
+                <HelpCircle size={14} className="text-primary" />
+              </div>
+              <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
                 带着问题去听
               </p>
             </div>
-            <div className="bg-card border border-border rounded-xl p-4 space-y-2.5">
+            <div className="bg-card border border-border rounded-2xl p-4 space-y-2.5 shadow-sm">
               {entry.listenGuide.map((q, i) => (
                 <div key={i} className="flex gap-3 items-start">
-                  <span className="text-xs font-bold text-primary bg-primary/10 rounded-full w-5 h-5 flex items-center justify-center shrink-0 mt-0.5">
+                  <span className="text-xs font-bold text-primary-foreground bg-primary rounded-full w-5 h-5 flex items-center justify-center shrink-0 mt-0.5">
                     {i + 1}
                   </span>
                   <p className="text-sm leading-relaxed text-surface-foreground">
@@ -184,7 +192,7 @@ const Preview = () => {
         {/* Go Listen Button */}
         <button
           onClick={() => navigate(`/notes/${entry.id}`)}
-          className="w-full mt-4 bg-primary text-primary-foreground font-display font-semibold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all hover:brightness-110"
+          className="w-full mt-4 bg-primary text-primary-foreground font-display font-bold py-3.5 rounded-2xl flex items-center justify-center gap-2 transition-all hover:brightness-110 shadow-md shadow-primary/20"
         >
           <Headphones size={18} />
           听完做笔记

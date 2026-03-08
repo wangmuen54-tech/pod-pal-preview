@@ -11,7 +11,7 @@ const History = () => {
   return (
     <div className="min-h-screen bg-background pb-20">
       <div className="px-6 pt-12 pb-6">
-        <h1 className="text-2xl font-display font-bold">历史记录</h1>
+        <h1 className="text-2xl font-display font-extrabold">历史记录</h1>
       </div>
 
       <div className="px-6">
@@ -29,11 +29,11 @@ const History = () => {
                     ? navigate(`/notes/${entry.id}`)
                     : navigate(`/preview/${entry.id}`)
                 }
-                className="w-full bg-card border border-border rounded-xl px-4 py-4 text-left transition-colors hover:border-primary/30 animate-fade-in"
+                className="w-full bg-card border border-border rounded-2xl px-4 py-4 text-left transition-all hover:shadow-md hover:border-primary/20 animate-fade-in"
               >
                 <div className="flex items-center justify-between">
                   <div className="min-w-0 flex-1">
-                    <p className="font-medium text-sm truncate mb-1">
+                    <p className="font-semibold text-sm truncate mb-1">
                       {entry.title}
                     </p>
                     {entry.notes?.rating ? (

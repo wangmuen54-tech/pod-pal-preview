@@ -6,12 +6,12 @@ const BottomNav = () => {
   const navigate = useNavigate();
 
   const tabs = [
-    { path: "/", icon: Home, label: "Home" },
-    { path: "/history", icon: Clock, label: "History" },
+    { path: "/", icon: Home, label: "首页" },
+    { path: "/history", icon: Clock, label: "历史" },
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50">
+    <nav className="fixed bottom-0 left-0 right-0 bg-card/80 backdrop-blur-xl border-t border-border z-50">
       <div className="max-w-lg mx-auto flex">
         {tabs.map(({ path, icon: Icon, label }) => {
           const active = location.pathname === path;
@@ -24,7 +24,7 @@ const BottomNav = () => {
               }`}
             >
               <Icon size={20} />
-              <span className="text-xs font-medium">{label}</span>
+              <span className="text-xs font-semibold">{label}</span>
             </button>
           );
         })}
