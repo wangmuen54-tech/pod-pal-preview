@@ -4,6 +4,7 @@ export interface PodcastEntry {
   id: string;
   url: string;
   title: string;
+  showName?: string;
   brief: string;
   background?: string;
   listenGuide?: string[];
