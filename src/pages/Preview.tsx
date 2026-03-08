@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
-  ArrowLeft, Headphones, ChevronDown, ChevronUp,
+  ArrowLeft, Headphones, ChevronDown, ChevronUp, ExternalLink,
   User, Lightbulb, Calendar, MessageCircle, BookOpen, HelpCircle, Info,
   Copy,
 } from "lucide-react";
@@ -198,6 +198,7 @@ const Preview = () => {
         >
           <Headphones size={18} />
           去收听
+          <ExternalLink size={14} className="opacity-60" />
         </a>
 
         {/* Write Notes */}
