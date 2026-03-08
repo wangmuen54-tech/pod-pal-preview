@@ -30,11 +30,9 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
-      <div className="px-6 pt-12 pb-6">
+      <div className="px-6 pt-10 pb-4">
         <div className="flex items-center gap-3 mb-1">
-          <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center shadow-lg shadow-primary/25">
-            <Headphones size={22} className="text-primary-foreground" />
-          </div>
+          <img src={cuteBear} alt="PodPrep mascot" className="w-16 h-16 drop-shadow-md" />
           <div>
             <h1 className="text-2xl font-display font-extrabold">PodPrep</h1>
             <p className="text-muted-foreground text-xs">AI 播客预习助手</p>
