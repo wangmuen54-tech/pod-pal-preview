@@ -198,9 +198,9 @@ const ListenCalendar = () => {
               {totalHours > 0 ? `${totalHours}h${totalRemainingMins > 0 ? `${totalRemainingMins}m` : ""}` : `${stats.totalMinutes}m`}
             </p>
           )}
-          <p className="text-xs text-muted-foreground mt-0.5">总时长</p>
+          <p className="text-[10px] text-muted-foreground">总时长</p>
         </div>
-        <div className="flex-1 bg-muted rounded-xl p-3 text-center">
+        <div className="flex-1 bg-muted rounded-lg p-2 text-center">
           <CalendarDays size={16} className="mx-auto text-primary mb-1" />
           {editingStats ? (
             <input
