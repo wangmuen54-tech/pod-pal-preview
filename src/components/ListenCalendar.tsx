@@ -115,7 +115,7 @@ const ListenCalendar = () => {
       {/* Days Grid */}
       <div className="grid grid-cols-7 gap-0.5">
         {Array.from({ length: startPadding }).map((_, i) => (
-          <div key={`pad-${i}`} className="aspect-square" />
+          <div key={`pad-${i}`} className="h-7" />
         ))}
         {days.map((day) => {
           const key = format(day, "yyyy-MM-dd");
@@ -129,7 +129,7 @@ const ListenCalendar = () => {
               key={key}
               onClick={() => handleDayClick(day)}
               disabled={future}
-              className={`aspect-square rounded text-[10px] font-semibold flex items-center justify-center transition-all relative ${
+              className={`h-7 rounded text-[10px] font-semibold flex items-center justify-center transition-all relative ${
                 future
                   ? "text-muted-foreground/30 cursor-default"
                   : selected
