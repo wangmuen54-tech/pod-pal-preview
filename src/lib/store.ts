@@ -63,9 +63,13 @@ export async function generatePreview(url: string): Promise<PodcastEntry> {
     url,
     title: preview.title,
     brief: preview.brief,
+    background: preview.background,
+    listenGuide: preview.listenGuide,
     keyPeople: preview.keyPeople,
     keyConcepts: preview.keyConcepts,
     keyEvents: preview.keyEvents,
+    controversies: preview.controversies,
+    relatedResources: preview.relatedResources,
     createdAt: new Date().toISOString(),
   };
 
