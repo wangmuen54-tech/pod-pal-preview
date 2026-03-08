@@ -104,9 +104,9 @@ const ListenCalendar = () => {
       </div>
 
       {/* Weekday Headers */}
-      <div className="grid grid-cols-7 gap-1 mb-1">
+      <div className="grid grid-cols-7 gap-0.5 mb-0.5">
         {WEEKDAYS.map((d) => (
-          <div key={d} className="text-center text-xs text-muted-foreground font-semibold py-1">
+          <div key={d} className="text-center text-[10px] text-muted-foreground font-semibold py-0.5">
             {d}
           </div>
         ))}
