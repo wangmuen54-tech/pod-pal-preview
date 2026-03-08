@@ -25,7 +25,8 @@ function getColorClass(minutes: number): string {
 const ListenCalendar = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [inputMinutes, setInputMinutes] = useState("");
+  const [inputH, setInputH] = useState("");
+  const [inputM, setInputM] = useState("");
   const [, setTick] = useState(0);
 
   // Stats editing
