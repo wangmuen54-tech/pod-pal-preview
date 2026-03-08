@@ -57,12 +57,15 @@ const ListenCalendar = () => {
 
   const handleSaveMinutes = () => {
     if (!selectedDate) return;
-    const mins = parseInt(inputMinutes) || 0;
+    const mins = (parseInt(inputH) || 0) * 60 + (parseInt(inputM) || 0);
     logListening(selectedDate, mins);
     clearStatsOverride();
     setSelectedDate(null);
-    setInputMinutes("");
-    toast.success(mins > 0 ? `已记录 ${mins} 分钟` : "已清除记录");
+    setInputH("");
+    setInputM("");
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    toast.success(mins > 0 ? `已记录 ${h}h${m}min` : "已清除记录");
     setTick((t) => t + 1);
   };
 
