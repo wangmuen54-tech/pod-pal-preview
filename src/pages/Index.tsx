@@ -29,17 +29,19 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background pb-20 relative overflow-hidden">
-      {/* Decorative background blobs */}
-      <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-primary/10 blur-3xl" />
-      <div className="absolute top-40 -left-32 w-72 h-72 rounded-full bg-accent/15 blur-3xl" />
-      <div className="absolute bottom-32 right-0 w-48 h-48 rounded-full bg-primary/8 blur-2xl" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 w-56 h-56 rounded-full bg-secondary/20 blur-3xl" />
+      {/* Decorative circles */}
+      <div className="absolute -top-12 -right-12 w-40 h-40 rounded-full bg-primary/15" />
+      <div className="absolute top-6 -right-4 w-20 h-20 rounded-full bg-accent/20" />
+      <div className="absolute top-64 -left-10 w-28 h-28 rounded-full bg-primary/10" />
+      <div className="absolute bottom-48 right-6 w-14 h-14 rounded-full bg-accent/15" />
+      <div className="absolute bottom-72 -left-6 w-10 h-10 rounded-full bg-primary/20" />
+
       {/* Header */}
-      <div className="px-6 pt-10 pb-4">
+      <div className="relative px-6 pt-10 pb-4">
         <div className="flex items-center gap-3 mb-1">
           <img src={cuteBear} alt="PodPrep mascot" className="w-16 h-16 drop-shadow-md" />
           <div>
-            <h1 className="text-2xl font-display font-extrabold">PodPrep</h1>
+            <h1 className="text-2xl font-display font-extrabold text-foreground">PodPrep</h1>
             <p className="text-muted-foreground text-xs">AI 播客预习助手</p>
           </div>
         </div>
