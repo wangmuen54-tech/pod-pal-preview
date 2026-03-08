@@ -147,12 +147,12 @@ const ListenCalendar = () => {
       </div>
 
       {/* Legend */}
-      <div className="flex items-center justify-center gap-1.5 mt-3">
-        <span className="text-xs text-muted-foreground">少</span>
+      <div className="flex items-center justify-center gap-1 mt-2">
+        <span className="text-[10px] text-muted-foreground">少</span>
         {[0, 15, 30, 60, 90].map((m) => (
-          <div key={m} className={`w-3 h-3 rounded-sm ${getColorClass(m)}`} />
+          <div key={m} className={`w-2.5 h-2.5 rounded-sm ${getColorClass(m)}`} />
         ))}
-        <span className="text-xs text-muted-foreground">多</span>
+        <span className="text-[10px] text-muted-foreground">多</span>
       </div>
 
       {/* Input for selected date */}
