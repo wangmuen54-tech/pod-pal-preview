@@ -5,9 +5,13 @@ export interface PodcastEntry {
   url: string;
   title: string;
   brief: string;
+  background?: string;
+  listenGuide?: string[];
   keyPeople: { name: string; description: string }[];
   keyConcepts: { name: string; description: string }[];
   keyEvents: { name: string; description: string }[];
+  controversies?: { name: string; description: string }[];
+  relatedResources?: { name: string; description: string }[];
   createdAt: string;
   notes?: {
     topic: string;
@@ -59,9 +63,13 @@ export async function generatePreview(url: string): Promise<PodcastEntry> {
     url,
     title: preview.title,
     brief: preview.brief,
+    background: preview.background,
+    listenGuide: preview.listenGuide,
     keyPeople: preview.keyPeople,
     keyConcepts: preview.keyConcepts,
     keyEvents: preview.keyEvents,
+    controversies: preview.controversies,
+    relatedResources: preview.relatedResources,
     createdAt: new Date().toISOString(),
   };
 
