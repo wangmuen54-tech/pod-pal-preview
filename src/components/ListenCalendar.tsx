@@ -59,7 +59,6 @@ const ListenCalendar = () => {
     if (!selectedDate) return;
     const mins = (parseInt(inputH) || 0) * 60 + (parseInt(inputM) || 0);
     logListening(selectedDate, mins);
-    clearStatsOverride();
     setSelectedDate(null);
     setInputH("");
     setInputM("");
