@@ -113,7 +113,7 @@ const ListenCalendar = () => {
       </div>
 
       {/* Days Grid */}
-      <div className="grid grid-cols-7 gap-1">
+      <div className="grid grid-cols-7 gap-0.5">
         {Array.from({ length: startPadding }).map((_, i) => (
           <div key={`pad-${i}`} className="aspect-square" />
         ))}
@@ -129,17 +129,17 @@ const ListenCalendar = () => {
               key={key}
               onClick={() => handleDayClick(day)}
               disabled={future}
-              className={`aspect-square rounded-lg text-xs font-semibold flex items-center justify-center transition-all relative ${
+              className={`aspect-square rounded text-[10px] font-semibold flex items-center justify-center transition-all relative ${
                 future
                   ? "text-muted-foreground/30 cursor-default"
                   : selected
-                    ? "ring-2 ring-primary ring-offset-1"
+                    ? "ring-1 ring-primary ring-offset-1"
                     : "hover:ring-1 hover:ring-primary/30"
               } ${getColorClass(mins)} ${mins > 0 ? "text-primary-foreground" : "text-foreground"}`}
             >
               {day.getDate()}
               {today && (
-                <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary" />
+                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0.5 h-0.5 rounded-full bg-primary" />
               )}
             </button>
           );
