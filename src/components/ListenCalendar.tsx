@@ -85,21 +85,21 @@ const ListenCalendar = () => {
   return (
     <div className="bg-card border border-border rounded-2xl p-3 shadow-sm">
       {/* Month Nav */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-2">
         <button
           onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-          className="w-8 h-8 rounded-xl bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+          className="w-6 h-6 rounded-lg bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
         >
-          <ChevronLeft size={16} />
+          <ChevronLeft size={14} />
         </button>
-        <span className="text-sm font-bold">
+        <span className="text-xs font-bold">
           {format(currentMonth, "yyyy年M月", { locale: zhCN })}
         </span>
         <button
           onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-          className="w-8 h-8 rounded-xl bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+          className="w-6 h-6 rounded-lg bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
         >
-          <ChevronRight size={16} />
+          <ChevronRight size={14} />
         </button>
       </div>
 
