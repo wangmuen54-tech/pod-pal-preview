@@ -4,6 +4,7 @@ export interface PodcastEntry {
   id: string;
   url: string;
   title: string;
+  showName?: string;
   brief: string;
   background?: string;
   listenGuide?: string[];
@@ -62,6 +63,7 @@ export async function generatePreview(url: string): Promise<PodcastEntry> {
     id: crypto.randomUUID(),
     url,
     title: preview.title,
+    showName: preview.showName || "",
     brief: preview.brief,
     background: preview.background,
     listenGuide: preview.listenGuide,

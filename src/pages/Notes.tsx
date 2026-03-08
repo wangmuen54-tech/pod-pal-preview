@@ -11,6 +11,7 @@ const Notes = () => {
   const navigate = useNavigate();
   const entry = getEntry(id!);
 
+  const [showName, setShowName] = useState(entry?.showName || "");
   const [topic, setTopic] = useState(entry?.notes?.topic || "");
   const [keyPoints, setKeyPoints] = useState(
     entry?.notes?.keyPoints?.join("\n") || ""
@@ -84,6 +85,7 @@ const Notes = () => {
   const handleSave = () => {
     const updatedEntry = {
       ...entry,
+      showName: showName.trim() || entry.showName,
       notes: {
         topic,
         keyPoints: keyPoints.split("\n").filter((p) => p.trim()),
@@ -112,6 +114,19 @@ const Notes = () => {
 
       <div className="px-6 pt-6 space-y-5">
         <h1 className="text-xl font-display font-extrabold">{entry.title}</h1>
+
+        {/* Show Name */}
+        <div>
+          <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 block">
+            所属节目
+          </label>
+          <input
+            value={showName}
+            onChange={(e) => setShowName(e.target.value)}
+            placeholder="播客节目名称，如「硬地骇客」"
+            className="w-full bg-card border border-border rounded-2xl px-4 py-3.5 text-sm outline-none focus:ring-2 focus:ring-primary transition-all placeholder:text-muted-foreground shadow-sm"
+          />
+        </div>
 
         {/* Topic */}
         <div>
