@@ -167,21 +167,32 @@ const ListenCalendar = () => {
       {selectedDate && (
         <div className="mt-3 p-2.5 bg-muted rounded-xl animate-fade-in">
           <p className="text-xs font-semibold text-muted-foreground mb-2">
-            {selectedDate} 收听时长（分钟）
+            {selectedDate} 收听时长
           </p>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-1.5">
             <input
               type="number"
               min="0"
-              value={inputMinutes}
-              onChange={(e) => setInputMinutes(e.target.value)}
+              value={inputH}
+              onChange={(e) => setInputH(e.target.value)}
               placeholder="0"
-              className="flex-1 bg-card border border-border rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary transition-all"
+              className="w-14 bg-card border border-border rounded-lg px-2 py-2 text-sm text-center outline-none focus:ring-2 focus:ring-primary transition-all"
               autoFocus
             />
+            <span className="text-xs font-semibold text-muted-foreground">h</span>
+            <input
+              type="number"
+              min="0"
+              max="59"
+              value={inputM}
+              onChange={(e) => setInputM(e.target.value)}
+              placeholder="0"
+              className="w-14 bg-card border border-border rounded-lg px-2 py-2 text-sm text-center outline-none focus:ring-2 focus:ring-primary transition-all"
+            />
+            <span className="text-xs font-semibold text-muted-foreground">min</span>
             <button
               onClick={handleSaveMinutes}
-              className="px-4 py-2 bg-primary text-primary-foreground rounded-xl text-sm font-semibold hover:brightness-110 transition-all"
+              className="ml-auto px-3 py-2 bg-primary text-primary-foreground rounded-lg text-xs font-semibold hover:brightness-110 transition-all"
             >
               保存
             </button>
