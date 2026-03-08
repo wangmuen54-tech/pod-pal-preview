@@ -1,14 +1,18 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronRight, PenLine, Radio, ChevronDown } from "lucide-react";
+import { PenLine, Radio, ChevronDown, Tag } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
-import StarRating from "@/components/StarRating";
-import { getEntries } from "@/lib/store";
+import SwipeableNoteCard from "@/components/SwipeableNoteCard";
+import { getEntries, saveEntry, CATEGORIES, type PodcastCategory, type PodcastEntry } from "@/lib/store";
+import { toast } from "sonner";
 
 const NotesList = () => {
   const navigate = useNavigate();
+  const [, setTick] = useState(0); // force re-render after mutations
   const entries = getEntries().filter((e) => e.notes);
+
   const [selectedShow, setSelectedShow] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<PodcastCategory | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
 
   // Group by show name
@@ -21,9 +25,40 @@ const NotesList = () => {
     return Array.from(map.entries()).sort((a, b) => b[1] - a[1]);
   }, [entries]);
 
-  const filtered = selectedShow
-    ? entries.filter((e) => (e.showName?.trim() || "未分类") === selectedShow)
-    : entries;
+  const filtered = useMemo(() => {
+    let list = entries;
+    if (selectedShow) {
+      list = list.filter((e) => (e.showName?.trim() || "未分类") === selectedShow);
+    }
+    if (selectedCategory) {
+      list = list.filter((e) => e.category === selectedCategory);
+    }
+    // Sort: pinned first, then by date
+    return list.sort((a, b) => {
+      if (a.pinned && !b.pinned) return -1;
+      if (!a.pinned && b.pinned) return 1;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+  }, [entries, selectedShow, selectedCategory]);
+
+  const handlePin = (id: string) => {
+    const entry = entries.find((e) => e.id === id);
+    if (!entry) return;
+    saveEntry({ ...entry, pinned: !entry.pinned });
+    toast.success(entry.pinned ? "已取消置顶" : "已置顶");
+    setTick((t) => t + 1);
+  };
+
+  const handleDelete = (id: string) => {
+    const allEntries = getEntries();
+    const entry = allEntries.find((e) => e.id === id);
+    if (!entry) return;
+    // Remove notes from the entry
+    const updated = { ...entry, notes: undefined };
+    saveEntry(updated);
+    toast.success("笔记已删除");
+    setTick((t) => t + 1);
+  };
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -32,6 +67,35 @@ const NotesList = () => {
         <p className="text-muted-foreground text-xs mt-1">
           {entries.length} 篇笔记 · {shows.length} 个节目
         </p>
+      </div>
+
+      {/* Category Filter */}
+      <div className="px-6 mb-3">
+        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+          <button
+            onClick={() => setSelectedCategory(null)}
+            className={`px-3 py-1.5 rounded-full text-xs font-semibold border whitespace-nowrap transition-all ${
+              !selectedCategory
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-card border-border text-muted-foreground hover:border-primary/30"
+            }`}
+          >
+            全部
+          </button>
+          {CATEGORIES.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setSelectedCategory(selectedCategory === cat ? null : cat)}
+              className={`px-3 py-1.5 rounded-full text-xs font-semibold border whitespace-nowrap transition-all ${
+                selectedCategory === cat
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-card border-border text-muted-foreground hover:border-primary/30"
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Show Filter */}
@@ -98,38 +162,21 @@ const NotesList = () => {
           </div>
         ) : filtered.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-muted-foreground text-sm">该节目暂无笔记</p>
+            <p className="text-muted-foreground text-sm">暂无匹配的笔记</p>
           </div>
         ) : (
           <div className="space-y-3">
+            <p className="text-xs text-muted-foreground/60 text-center">
+              ← 左滑删除 · 右滑置顶 →
+            </p>
             {filtered.map((entry) => (
-              <button
+              <SwipeableNoteCard
                 key={entry.id}
-                onClick={() => navigate(`/notes/${entry.id}`)}
-                className="w-full bg-card border border-border rounded-2xl px-4 py-4 text-left transition-all hover:shadow-md hover:border-primary/20 animate-fade-in"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="min-w-0 flex-1">
-                    <p className="font-semibold text-sm truncate mb-1">{entry.title}</p>
-                    <div className="flex items-center gap-2 mb-1">
-                      {!selectedShow && entry.showName && (
-                        <span className="text-xs text-primary/80 bg-primary/10 px-2 py-0.5 rounded-full truncate max-w-[140px]">
-                          {entry.showName}
-                        </span>
-                      )}
-                      {entry.notes?.topic && (
-                        <span className="text-xs text-muted-foreground truncate">
-                          📌 {entry.notes.topic}
-                        </span>
-                      )}
-                    </div>
-                    {entry.notes?.rating ? (
-                      <StarRating rating={entry.notes.rating} size={14} />
-                    ) : null}
-                  </div>
-                  <ChevronRight size={16} className="text-muted-foreground shrink-0 ml-2" />
-                </div>
-              </button>
+                entry={entry}
+                showShowName={!selectedShow}
+                onPin={handlePin}
+                onDelete={handleDelete}
+              />
             ))}
           </div>
         )}

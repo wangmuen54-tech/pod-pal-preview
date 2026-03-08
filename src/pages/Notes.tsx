@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Save, Copy, Share2 } from "lucide-react";
-import { getEntry, saveEntry, type PodcastEntry } from "@/lib/store";
+import { getEntry, saveEntry, CATEGORIES, type PodcastEntry, type PodcastCategory } from "@/lib/store";
 import { upsertReviewItem } from "@/lib/review";
 import StarRating from "@/components/StarRating";
 import { toast } from "sonner";
@@ -12,6 +12,7 @@ const Notes = () => {
   const entry = getEntry(id!);
 
   const [showName, setShowName] = useState(entry?.showName || "");
+  const [category, setCategory] = useState<PodcastCategory | "">(entry?.category || "");
   const [topic, setTopic] = useState(entry?.notes?.topic || "");
   const [keyPoints, setKeyPoints] = useState(
     entry?.notes?.keyPoints?.join("\n") || ""
@@ -86,6 +87,7 @@ const Notes = () => {
     const updatedEntry = {
       ...entry,
       showName: showName.trim() || entry.showName,
+      category: category || undefined,
       notes: {
         topic,
         keyPoints: keyPoints.split("\n").filter((p) => p.trim()),
@@ -126,6 +128,29 @@ const Notes = () => {
             placeholder="播客节目名称，如「硬地骇客」"
             className="w-full bg-card border border-border rounded-2xl px-4 py-3.5 text-sm outline-none focus:ring-2 focus:ring-primary transition-all placeholder:text-muted-foreground shadow-sm"
           />
+        </div>
+
+        {/* Category */}
+        <div>
+          <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 block">
+            分类
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setCategory(category === cat ? "" : cat)}
+                className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+                  category === cat
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-card border-border text-muted-foreground hover:border-primary/30"
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Topic */}

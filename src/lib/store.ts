@@ -1,10 +1,24 @@
 import { supabase } from "@/integrations/supabase/client";
 
+export const CATEGORIES = [
+  "AI",
+  "自我成长",
+  "阅读类",
+  "影视娱乐",
+  "商业政治",
+  "旅行见闻",
+  "兴趣生活",
+] as const;
+
+export type PodcastCategory = (typeof CATEGORIES)[number];
+
 export interface PodcastEntry {
   id: string;
   url: string;
   title: string;
   showName?: string;
+  category?: PodcastCategory;
+  pinned?: boolean;
   brief: string;
   background?: string;
   listenGuide?: string[];
