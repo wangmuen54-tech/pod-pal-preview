@@ -211,9 +211,9 @@ const ListenCalendar = () => {
               className="w-full text-center bg-card border border-border rounded-lg px-2 py-1 text-sm font-bold outline-none focus:ring-2 focus:ring-primary"
             />
           ) : (
-            <p className="text-sm font-bold">{stats.totalDays}</p>
+            <p className="text-xs font-bold">{stats.totalDays}</p>
           )}
-          <p className="text-xs text-muted-foreground mt-0.5">收听天数</p>
+          <p className="text-[10px] text-muted-foreground">收听天数</p>
         </div>
       </div>
 
