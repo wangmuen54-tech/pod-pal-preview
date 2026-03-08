@@ -32,7 +32,8 @@ const ListenCalendar = () => {
   // Stats editing
   const [editingStats, setEditingStats] = useState(false);
   const stats = getEffectiveStats();
-  const [editTotalMinutes, setEditTotalMinutes] = useState(stats.totalMinutes);
+  const [editH, setEditH] = useState(Math.floor(stats.totalMinutes / 60));
+  const [editM, setEditM] = useState(stats.totalMinutes % 60);
   const [editTotalDays, setEditTotalDays] = useState(stats.totalDays);
 
   const log = getListenLog();
