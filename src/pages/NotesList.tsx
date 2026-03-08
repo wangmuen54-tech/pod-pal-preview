@@ -4,6 +4,7 @@ import { PenLine, CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import BottomNav from "@/components/BottomNav";
 import SwipeableNoteCard from "@/components/SwipeableNoteCard";
+import ListenCalendar from "@/components/ListenCalendar";
 import { getEntries, saveEntry, CATEGORIES, type PodcastCategory } from "@/lib/store";
 import { toast } from "sonner";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
