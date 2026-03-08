@@ -184,7 +184,7 @@ const ListenCalendar = () => {
       {/* Stats */}
       <div className="mt-3 flex gap-2">
         <div className="flex-1 bg-muted rounded-lg p-2 text-center">
-          <Clock size={16} className="mx-auto text-primary mb-1" />
+          <Clock size={14} className="mx-auto text-primary mb-0.5" />
           {editingStats ? (
             <input
               type="number"
