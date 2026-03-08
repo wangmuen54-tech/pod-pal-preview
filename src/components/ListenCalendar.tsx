@@ -194,7 +194,7 @@ const ListenCalendar = () => {
               className="w-full text-center bg-card border border-border rounded-lg px-2 py-1 text-sm font-bold outline-none focus:ring-2 focus:ring-primary"
             />
           ) : (
-            <p className="text-sm font-bold">
+            <p className="text-xs font-bold">
               {totalHours > 0 ? `${totalHours}h${totalRemainingMins > 0 ? `${totalRemainingMins}m` : ""}` : `${stats.totalMinutes}m`}
             </p>
           )}
