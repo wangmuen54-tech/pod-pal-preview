@@ -85,6 +85,7 @@ const Notes = () => {
   const handleSave = () => {
     const updatedEntry = {
       ...entry,
+      showName: showName.trim() || entry.showName,
       notes: {
         topic,
         keyPoints: keyPoints.split("\n").filter((p) => p.trim()),
