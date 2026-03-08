@@ -205,16 +205,28 @@ const ListenCalendar = () => {
         <div className="flex-1 bg-muted rounded-lg p-2 text-center">
           <Clock size={14} className="mx-auto text-primary mb-0.5" />
           {editingStats ? (
-            <input
-              type="number"
-              min="0"
-              value={editTotalMinutes}
-              onChange={(e) => setEditTotalMinutes(parseInt(e.target.value) || 0)}
-              className="w-full text-center bg-card border border-border rounded-lg px-2 py-1 text-sm font-bold outline-none focus:ring-2 focus:ring-primary"
-            />
+            <div className="flex items-center justify-center gap-1">
+              <input
+                type="number"
+                min="0"
+                value={editH}
+                onChange={(e) => setEditH(parseInt(e.target.value) || 0)}
+                className="w-10 text-center bg-card border border-border rounded px-1 py-0.5 text-xs font-bold outline-none focus:ring-1 focus:ring-primary"
+              />
+              <span className="text-[10px] text-muted-foreground">h</span>
+              <input
+                type="number"
+                min="0"
+                max="59"
+                value={editM}
+                onChange={(e) => setEditM(parseInt(e.target.value) || 0)}
+                className="w-10 text-center bg-card border border-border rounded px-1 py-0.5 text-xs font-bold outline-none focus:ring-1 focus:ring-primary"
+              />
+              <span className="text-[10px] text-muted-foreground">min</span>
+            </div>
           ) : (
             <p className="text-xs font-bold">
-              {totalHours > 0 ? `${totalHours}h${totalRemainingMins > 0 ? `${totalRemainingMins}m` : ""}` : `${stats.totalMinutes}m`}
+              {totalHours}h{totalRemainingMins}min
             </p>
           )}
           <p className="text-[10px] text-muted-foreground">总时长</p>
