@@ -63,6 +63,11 @@ const NotesList = () => {
         </p>
       </div>
 
+      {/* Listen Calendar */}
+      <div className="px-6 mb-5">
+        <ListenCalendar />
+      </div>
+
       {/* Category Filter */}
       <div className="px-6 mb-3">
         <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
