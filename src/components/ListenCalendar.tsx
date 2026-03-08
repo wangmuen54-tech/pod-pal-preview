@@ -25,13 +25,15 @@ function getColorClass(minutes: number): string {
 const ListenCalendar = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [inputMinutes, setInputMinutes] = useState("");
+  const [inputH, setInputH] = useState("");
+  const [inputM, setInputM] = useState("");
   const [, setTick] = useState(0);
 
   // Stats editing
   const [editingStats, setEditingStats] = useState(false);
   const stats = getEffectiveStats();
-  const [editTotalMinutes, setEditTotalMinutes] = useState(stats.totalMinutes);
+  const [editH, setEditH] = useState(Math.floor(stats.totalMinutes / 60));
+  const [editM, setEditM] = useState(stats.totalMinutes % 60);
   const [editTotalDays, setEditTotalDays] = useState(stats.totalDays);
 
   const log = getListenLog();
@@ -48,23 +50,28 @@ const ListenCalendar = () => {
     if (isFuture(date)) return;
     const key = format(date, "yyyy-MM-dd");
     setSelectedDate(key);
-    setInputMinutes(log[key]?.toString() || "");
+    const totalMins = log[key] || 0;
+    setInputH(Math.floor(totalMins / 60).toString());
+    setInputM((totalMins % 60).toString());
   };
 
   const handleSaveMinutes = () => {
     if (!selectedDate) return;
-    const mins = parseInt(inputMinutes) || 0;
+    const mins = (parseInt(inputH) || 0) * 60 + (parseInt(inputM) || 0);
     logListening(selectedDate, mins);
     clearStatsOverride();
     setSelectedDate(null);
-    setInputMinutes("");
-    toast.success(mins > 0 ? `已记录 ${mins} 分钟` : "已清除记录");
+    setInputH("");
+    setInputM("");
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    toast.success(mins > 0 ? `已记录 ${h}h${m}min` : "已清除记录");
     setTick((t) => t + 1);
   };
 
   const handleSaveStats = () => {
     setListenStats({
-      totalMinutes: editTotalMinutes,
+      totalMinutes: (parseInt(editH.toString()) || 0) * 60 + (parseInt(editM.toString()) || 0),
       totalDays: editTotalDays,
     });
     setEditingStats(false);
@@ -74,7 +81,8 @@ const ListenCalendar = () => {
 
   const handleStartEditStats = () => {
     const s = getEffectiveStats();
-    setEditTotalMinutes(s.totalMinutes);
+    setEditH(Math.floor(s.totalMinutes / 60));
+    setEditM(s.totalMinutes % 60);
     setEditTotalDays(s.totalDays);
     setEditingStats(true);
   };
@@ -159,21 +167,32 @@ const ListenCalendar = () => {
       {selectedDate && (
         <div className="mt-3 p-2.5 bg-muted rounded-xl animate-fade-in">
           <p className="text-xs font-semibold text-muted-foreground mb-2">
-            {selectedDate} 收听时长（分钟）
+            {selectedDate} 收听时长
           </p>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-1.5">
             <input
               type="number"
               min="0"
-              value={inputMinutes}
-              onChange={(e) => setInputMinutes(e.target.value)}
+              value={inputH}
+              onChange={(e) => setInputH(e.target.value)}
               placeholder="0"
-              className="flex-1 bg-card border border-border rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary transition-all"
+              className="w-14 bg-card border border-border rounded-lg px-2 py-2 text-sm text-center outline-none focus:ring-2 focus:ring-primary transition-all"
               autoFocus
             />
+            <span className="text-xs font-semibold text-muted-foreground">h</span>
+            <input
+              type="number"
+              min="0"
+              max="59"
+              value={inputM}
+              onChange={(e) => setInputM(e.target.value)}
+              placeholder="0"
+              className="w-14 bg-card border border-border rounded-lg px-2 py-2 text-sm text-center outline-none focus:ring-2 focus:ring-primary transition-all"
+            />
+            <span className="text-xs font-semibold text-muted-foreground">min</span>
             <button
               onClick={handleSaveMinutes}
-              className="px-4 py-2 bg-primary text-primary-foreground rounded-xl text-sm font-semibold hover:brightness-110 transition-all"
+              className="ml-auto px-3 py-2 bg-primary text-primary-foreground rounded-lg text-xs font-semibold hover:brightness-110 transition-all"
             >
               保存
             </button>
@@ -186,16 +205,28 @@ const ListenCalendar = () => {
         <div className="flex-1 bg-muted rounded-lg p-2 text-center">
           <Clock size={14} className="mx-auto text-primary mb-0.5" />
           {editingStats ? (
-            <input
-              type="number"
-              min="0"
-              value={editTotalMinutes}
-              onChange={(e) => setEditTotalMinutes(parseInt(e.target.value) || 0)}
-              className="w-full text-center bg-card border border-border rounded-lg px-2 py-1 text-sm font-bold outline-none focus:ring-2 focus:ring-primary"
-            />
+            <div className="flex items-center justify-center gap-1">
+              <input
+                type="number"
+                min="0"
+                value={editH}
+                onChange={(e) => setEditH(parseInt(e.target.value) || 0)}
+                className="w-10 text-center bg-card border border-border rounded px-1 py-0.5 text-xs font-bold outline-none focus:ring-1 focus:ring-primary"
+              />
+              <span className="text-[10px] text-muted-foreground">h</span>
+              <input
+                type="number"
+                min="0"
+                max="59"
+                value={editM}
+                onChange={(e) => setEditM(parseInt(e.target.value) || 0)}
+                className="w-10 text-center bg-card border border-border rounded px-1 py-0.5 text-xs font-bold outline-none focus:ring-1 focus:ring-primary"
+              />
+              <span className="text-[10px] text-muted-foreground">min</span>
+            </div>
           ) : (
             <p className="text-xs font-bold">
-              {totalHours > 0 ? `${totalHours}h${totalRemainingMins > 0 ? `${totalRemainingMins}m` : ""}` : `${stats.totalMinutes}m`}
+              {totalHours}h{totalRemainingMins}min
             </p>
           )}
           <p className="text-[10px] text-muted-foreground">总时长</p>
