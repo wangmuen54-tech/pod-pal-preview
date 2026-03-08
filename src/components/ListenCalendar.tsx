@@ -129,7 +129,7 @@ const ListenCalendar = () => {
               key={key}
               onClick={() => handleDayClick(day)}
               disabled={future}
-              className={`aspect-square rounded text-[10px] font-semibold flex items-center justify-center transition-all relative ${
+              className={`h-7 rounded text-[10px] font-semibold flex items-center justify-center transition-all relative ${
                 future
                   ? "text-muted-foreground/30 cursor-default"
                   : selected
