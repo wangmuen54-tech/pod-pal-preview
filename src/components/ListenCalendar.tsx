@@ -7,7 +7,6 @@ import {
   logListening,
   getEffectiveStats,
   setListenStats,
-  clearStatsOverride,
 } from "@/lib/listenLog";
 import { toast } from "sonner";
 
