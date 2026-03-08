@@ -34,6 +34,52 @@ const Notes = () => {
     );
   }
 
+  const buildText = () => {
+    const stars = "⭐".repeat(rating) + "☆".repeat(5 - rating);
+    return [
+      `📻 ${entry.title}`,
+      "",
+      `📌 主题：${topic || "未填写"}`,
+      "",
+      "📝 要点：",
+      ...keyPoints
+        .split("\n")
+        .filter((p) => p.trim())
+        .map((p, i) => `  ${i + 1}. ${p.trim()}`),
+      "",
+      `💭 我的想法：${thoughts || "未填写"}`,
+      "",
+      `评分：${stars}`,
+      "",
+      `🔗 ${entry.url}`,
+      "",
+      "— via PodPrep",
+    ].join("\n");
+  };
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(buildText());
+      toast.success("已复制到剪贴板");
+    } catch {
+      toast.error("复制失败");
+    }
+  };
+
+  const handleShare = async () => {
+    const text = buildText();
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: entry.title, text });
+      } catch {
+        // user cancelled
+      }
+    } else {
+      await navigator.clipboard.writeText(text);
+      toast.success("已复制到剪贴板（当前浏览器不支持分享）");
+    }
+  };
+
   const handleSave = () => {
     const updatedEntry = {
       ...entry,
