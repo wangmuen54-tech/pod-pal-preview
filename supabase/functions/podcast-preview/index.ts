@@ -108,7 +108,8 @@ ${pageContent.slice(0, 8000)}`
               parameters: {
                 type: 'object',
                 properties: {
-                  title: { type: 'string', description: '播客标题（简短有力）' },
+                  title: { type: 'string', description: '播客单集标题（简短有力）' },
+                  showName: { type: 'string', description: '播客节目名称（不是单集标题，而是这个播客节目/频道的名字，如"硬地骇客"、"半拿铁"、"纵横四海"等）' },
                   brief: { type: 'string', description: '30秒速览，3-4句话概括本期核心内容，让人快速了解这期在讲什么' },
                   background: { type: 'string', description: '背景知识，150-250字，介绍理解本期播客所需的前置知识和大背景' },
                   listenGuide: {
