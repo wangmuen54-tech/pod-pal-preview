@@ -71,7 +71,7 @@ const ListenCalendar = () => {
 
   const handleSaveStats = () => {
     setListenStats({
-      totalMinutes: editTotalMinutes,
+      totalMinutes: (parseInt(editH.toString()) || 0) * 60 + (parseInt(editM.toString()) || 0),
       totalDays: editTotalDays,
     });
     setEditingStats(false);
