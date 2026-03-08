@@ -42,11 +42,17 @@ export function getListenStats(): ListenStats {
 }
 
 export function setListenStats(stats: Partial<ListenStats>) {
-  // When user manually edits stats, we adjust the log proportionally
-  // For simplicity, we store overrides separately
   const OVERRIDE_KEY = "podprep_listen_stats_override";
+  const computed = getListenStats();
   const existing = JSON.parse(localStorage.getItem(OVERRIDE_KEY) || "{}");
-  localStorage.setItem(OVERRIDE_KEY, JSON.stringify({ ...existing, ...stats }));
+  const override: Record<string, number> = { ...existing };
+  if (stats.totalMinutes !== undefined) {
+    override.minutesOffset = stats.totalMinutes - computed.totalMinutes;
+  }
+  if (stats.totalDays !== undefined) {
+    override.daysOffset = stats.totalDays - computed.totalDays;
+  }
+  localStorage.setItem(OVERRIDE_KEY, JSON.stringify(override));
 }
 
 export function getEffectiveStats(): ListenStats {
@@ -55,8 +61,8 @@ export function getEffectiveStats(): ListenStats {
   try {
     const override = JSON.parse(localStorage.getItem(OVERRIDE_KEY) || "{}");
     return {
-      totalMinutes: override.totalMinutes ?? computed.totalMinutes,
-      totalDays: override.totalDays ?? computed.totalDays,
+      totalMinutes: computed.totalMinutes + (override.minutesOffset ?? 0),
+      totalDays: computed.totalDays + (override.daysOffset ?? 0),
     };
   } catch {
     return computed;

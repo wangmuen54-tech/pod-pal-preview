@@ -7,7 +7,6 @@ import {
   logListening,
   getEffectiveStats,
   setListenStats,
-  clearStatsOverride,
 } from "@/lib/listenLog";
 import { toast } from "sonner";
 
@@ -59,7 +58,6 @@ const ListenCalendar = () => {
     if (!selectedDate) return;
     const mins = (parseInt(inputH) || 0) * 60 + (parseInt(inputM) || 0);
     logListening(selectedDate, mins);
-    clearStatsOverride();
     setSelectedDate(null);
     setInputH("");
     setInputM("");
