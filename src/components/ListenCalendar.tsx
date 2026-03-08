@@ -83,7 +83,7 @@ const ListenCalendar = () => {
   const totalRemainingMins = stats.totalMinutes % 60;
 
   return (
-    <div className="bg-card border border-border rounded-2xl p-5 shadow-sm">
+    <div className="bg-card border border-border rounded-2xl p-3 shadow-sm">
       {/* Month Nav */}
       <div className="flex items-center justify-between mb-4">
         <button
