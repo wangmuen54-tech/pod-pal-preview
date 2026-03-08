@@ -1,14 +1,22 @@
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Sparkles, PenLine, Brain, ChevronRight } from "lucide-react";
+import { Sparkles, PenLine, Brain, ChevronRight, LogOut } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
-import { getEntries } from "@/lib/store";
+import { fetchEntries, type PodcastEntry } from "@/lib/store";
 import { getDueReviews } from "@/lib/review";
+import { useAuth } from "@/contexts/AuthContext";
 import cuteBear from "@/assets/cute-bear.png";
 
 const Index = () => {
   const navigate = useNavigate();
-  const entries = getEntries();
+  const { signOut } = useAuth();
+  const [entries, setEntries] = useState<PodcastEntry[]>([]);
   const dueCount = getDueReviews().length;
+
+  useEffect(() => {
+    fetchEntries().then(setEntries);
+  }, []);
+
   const notesCount = entries.filter((e) => e.notes).length;
 
   const actions = [
@@ -40,23 +48,29 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background pb-20 relative overflow-hidden">
-      {/* Decorative circles */}
       <div className="absolute -top-12 -right-12 w-40 h-40 rounded-full bg-primary/15" />
       <div className="absolute top-6 -right-4 w-20 h-20 rounded-full bg-accent/20" />
       <div className="absolute top-64 -left-10 w-28 h-28 rounded-full bg-primary/10" />
 
-      {/* Header */}
       <div className="relative px-6 pt-10 pb-4">
-        <div className="flex items-center gap-3 mb-1">
-          <img src={cuteBear} alt="PodPrep mascot" className="w-16 h-16 drop-shadow-md" />
-          <div>
-            <h1 className="text-2xl font-display font-extrabold text-foreground">PodPrep</h1>
-            <p className="text-muted-foreground text-xs">AI 播客预习助手</p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3 mb-1">
+            <img src={cuteBear} alt="PodPrep mascot" className="w-16 h-16 drop-shadow-md" />
+            <div>
+              <h1 className="text-2xl font-display font-extrabold text-foreground">PodPrep</h1>
+              <p className="text-muted-foreground text-xs">AI 播客预习助手</p>
+            </div>
           </div>
+          <button
+            onClick={signOut}
+            className="w-8 h-8 rounded-xl bg-card border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+            title="退出登录"
+          >
+            <LogOut size={16} />
+          </button>
         </div>
       </div>
 
-      {/* Quick Actions */}
       <div className="px-6 mb-6">
         <div className="space-y-3">
           {actions.map(({ icon: Icon, label, desc, path, color, badge }) => (
@@ -83,7 +97,6 @@ const Index = () => {
         </div>
       </div>
 
-      {/* Recent */}
       {recent.length > 0 && (
         <div className="px-6">
           <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-3">
