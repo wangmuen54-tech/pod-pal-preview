@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Headphones, Sparkles, ChevronRight } from "lucide-react";
+import { toast } from "sonner";
 import BottomNav from "@/components/BottomNav";
-import { getEntries, generateMockPreview, saveEntry } from "@/lib/store";
+import { getEntries, generatePreview, saveEntry } from "@/lib/store";
 
 const Index = () => {
   const [url, setUrl] = useState("");
@@ -10,15 +11,19 @@ const Index = () => {
   const navigate = useNavigate();
   const recent = getEntries().slice(0, 5);
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     if (!url.trim()) return;
     setLoading(true);
-    setTimeout(() => {
-      const entry = generateMockPreview(url);
+    try {
+      const entry = await generatePreview(url);
       saveEntry(entry);
-      setLoading(false);
       navigate(`/preview/${entry.id}`);
-    }, 1200);
+    } catch (err) {
+      console.error(err);
+      toast.error(err instanceof Error ? err.message : "生成失败，请重试");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

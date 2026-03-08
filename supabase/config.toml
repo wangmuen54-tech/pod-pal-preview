@@ -1,1 +1,4 @@
 project_id = "midomhaiusxtcojulmsa"
+
+[functions.podcast-preview]
+verify_jwt = false
