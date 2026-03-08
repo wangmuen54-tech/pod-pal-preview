@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Headphones, Sparkles, ChevronRight } from "lucide-react";
+import { Sparkles, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import BottomNav from "@/components/BottomNav";
 import { getEntries, generatePreview, saveEntry } from "@/lib/store";
+import cuteBear from "@/assets/cute-bear.png";
 
 const Index = () => {
   const [url, setUrl] = useState("");
