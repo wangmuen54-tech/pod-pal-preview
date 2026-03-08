@@ -111,7 +111,7 @@ const Notes = () => {
     };
     try {
       await saveEntryToDb(updatedEntry);
-      upsertReviewItem(updatedEntry);
+      await upsertReviewItem(updatedEntry);
       toast.success("笔记已保存");
       navigate("/notes-list");
     } catch (err: any) {
