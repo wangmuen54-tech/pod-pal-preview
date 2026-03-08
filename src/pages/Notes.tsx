@@ -11,6 +11,7 @@ const Notes = () => {
   const navigate = useNavigate();
   const entry = getEntry(id!);
 
+  const [showName, setShowName] = useState(entry?.showName || "");
   const [topic, setTopic] = useState(entry?.notes?.topic || "");
   const [keyPoints, setKeyPoints] = useState(
     entry?.notes?.keyPoints?.join("\n") || ""
