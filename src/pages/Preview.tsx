@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
-  ArrowLeft, Headphones, ChevronDown, ChevronUp,
+  ArrowLeft, Headphones, ChevronDown, ChevronUp, ExternalLink,
   User, Lightbulb, Calendar, MessageCircle, BookOpen, HelpCircle, Info,
   Copy,
 } from "lucide-react";
