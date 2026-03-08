@@ -130,6 +130,29 @@ const Notes = () => {
           />
         </div>
 
+        {/* Category */}
+        <div>
+          <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 block">
+            分类
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setCategory(category === cat ? "" : cat)}
+                className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+                  category === cat
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-card border-border text-muted-foreground hover:border-primary/30"
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Topic */}
         <div>
           <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 block">
