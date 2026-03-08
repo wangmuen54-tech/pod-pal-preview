@@ -101,9 +101,14 @@ const SwipeableNoteCard = ({ entry, showShowName, onPin, onDelete }: Props) => {
                 </span>
               )}
             </div>
-            {entry.notes?.rating ? (
-              <StarRating rating={entry.notes.rating} size={14} />
-            ) : null}
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">
+                {new Date(entry.createdAt).toLocaleDateString("zh-CN")}
+              </span>
+              {entry.notes?.rating ? (
+                <StarRating rating={entry.notes.rating} size={14} />
+              ) : null}
+            </div>
           </div>
           <ChevronRight size={16} className="text-muted-foreground shrink-0 ml-2" />
         </div>
