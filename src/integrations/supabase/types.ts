@@ -14,7 +14,69 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      podcast_entries: {
+        Row: {
+          background: string | null
+          brief: string
+          category: string | null
+          controversies: Json | null
+          created_at: string
+          id: string
+          key_concepts: Json | null
+          key_events: Json | null
+          key_people: Json | null
+          listen_guide: Json | null
+          notes: Json | null
+          pinned: boolean | null
+          related_resources: Json | null
+          show_name: string | null
+          title: string
+          updated_at: string
+          url: string
+          user_id: string
+        }
+        Insert: {
+          background?: string | null
+          brief?: string
+          category?: string | null
+          controversies?: Json | null
+          created_at?: string
+          id?: string
+          key_concepts?: Json | null
+          key_events?: Json | null
+          key_people?: Json | null
+          listen_guide?: Json | null
+          notes?: Json | null
+          pinned?: boolean | null
+          related_resources?: Json | null
+          show_name?: string | null
+          title: string
+          updated_at?: string
+          url?: string
+          user_id: string
+        }
+        Update: {
+          background?: string | null
+          brief?: string
+          category?: string | null
+          controversies?: Json | null
+          created_at?: string
+          id?: string
+          key_concepts?: Json | null
+          key_events?: Json | null
+          key_people?: Json | null
+          listen_guide?: Json | null
+          notes?: Json | null
+          pinned?: boolean | null
+          related_resources?: Json | null
+          show_name?: string | null
+          title?: string
+          updated_at?: string
+          url?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

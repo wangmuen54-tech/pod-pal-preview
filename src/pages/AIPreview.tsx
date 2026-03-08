@@ -1,22 +1,26 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Sparkles, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import BottomNav from "@/components/BottomNav";
-import { getEntries, generatePreview, saveEntry } from "@/lib/store";
+import { fetchEntries, generatePreview, saveEntryToDb, type PodcastEntry } from "@/lib/store";
 
 const AIPreview = () => {
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
+  const [recentPreviews, setRecentPreviews] = useState<PodcastEntry[]>([]);
   const navigate = useNavigate();
-  const recentPreviews = getEntries().slice(0, 5);
+
+  useEffect(() => {
+    fetchEntries().then((entries) => setRecentPreviews(entries.slice(0, 5)));
+  }, []);
 
   const handleGenerate = async () => {
     if (!url.trim()) return;
     setLoading(true);
     try {
       const entry = await generatePreview(url);
-      saveEntry(entry);
+      await saveEntryToDb(entry);
       navigate(`/preview/${entry.id}`);
     } catch (err) {
       console.error(err);

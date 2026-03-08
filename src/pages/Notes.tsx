@@ -1,34 +1,51 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Save, Copy, Share2 } from "lucide-react";
-import { getEntry, saveEntry, CATEGORIES, type PodcastCategory } from "@/lib/store";
+import { fetchEntry, saveEntryToDb, CATEGORIES, type PodcastCategory } from "@/lib/store";
 import { upsertReviewItem } from "@/lib/review";
 import StarRating from "@/components/StarRating";
 import { toast } from "sonner";
+import type { PodcastEntry } from "@/lib/store";
 
 const Notes = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const entry = getEntry(id!);
+  const [entry, setEntry] = useState<PodcastEntry | undefined>(undefined);
+  const [loading, setLoading] = useState(true);
 
-  const [title, setTitle] = useState(entry?.title || "");
-  const [showName, setShowName] = useState(entry?.showName || "");
-  const [category, setCategory] = useState<PodcastCategory | "">(entry?.category || "");
-  const [topic, setTopic] = useState(entry?.notes?.topic || "");
-  const [keyPoints, setKeyPoints] = useState(
-    entry?.notes?.keyPoints?.join("\n") || ""
-  );
-  const [thoughts, setThoughts] = useState(entry?.notes?.thoughts || "");
-  const [rating, setRating] = useState(entry?.notes?.rating || 0);
+  const [title, setTitle] = useState("");
+  const [showName, setShowName] = useState("");
+  const [category, setCategory] = useState<PodcastCategory | "">("");
+  const [topic, setTopic] = useState("");
+  const [keyPoints, setKeyPoints] = useState("");
+  const [thoughts, setThoughts] = useState("");
+  const [rating, setRating] = useState(0);
 
   useEffect(() => {
-    if (entry?.notes) {
-      setTopic(entry.notes.topic);
-      setKeyPoints(entry.notes.keyPoints.join("\n"));
-      setThoughts(entry.notes.thoughts);
-      setRating(entry.notes.rating);
-    }
-  }, []);
+    fetchEntry(id!).then((e) => {
+      if (e) {
+        setEntry(e);
+        setTitle(e.title || "");
+        setShowName(e.showName || "");
+        setCategory(e.category || "");
+        if (e.notes) {
+          setTopic(e.notes.topic);
+          setKeyPoints(e.notes.keyPoints.join("\n"));
+          setThoughts(e.notes.thoughts);
+          setRating(e.notes.rating);
+        }
+      }
+      setLoading(false);
+    });
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-8 h-8 border-3 border-primary/30 border-t-primary rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   if (!entry) {
     return (
@@ -48,10 +65,7 @@ const Notes = () => {
       `📌 主题：${topic || "未填写"}`,
       "",
       "📝 要点：",
-      ...keyPoints
-        .split("\n")
-        .filter((p) => p.trim())
-        .map((p, i) => `  ${i + 1}. ${p.trim()}`),
+      ...keyPoints.split("\n").filter((p) => p.trim()).map((p, i) => `  ${i + 1}. ${p.trim()}`),
       "",
       `💭 我的想法：${thoughts || "未填写"}`,
       "",
@@ -75,18 +89,14 @@ const Notes = () => {
   const handleShare = async () => {
     const text = buildText();
     if (navigator.share) {
-      try {
-        await navigator.share({ title, text });
-      } catch {
-        // user cancelled
-      }
+      try { await navigator.share({ title, text }); } catch {}
     } else {
       await navigator.clipboard.writeText(text);
       toast.success("已复制到剪贴板（当前浏览器不支持分享）");
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const updatedEntry = {
       ...entry,
       title: title.trim() || entry.title,
@@ -99,10 +109,14 @@ const Notes = () => {
         rating,
       },
     };
-    saveEntry(updatedEntry);
-    upsertReviewItem(updatedEntry);
-    toast.success("笔记已保存");
-    navigate("/notes-list");
+    try {
+      await saveEntryToDb(updatedEntry);
+      upsertReviewItem(updatedEntry);
+      toast.success("笔记已保存");
+      navigate("/notes-list");
+    } catch (err: any) {
+      toast.error(err.message || "保存失败");
+    }
   };
 
   const dateStr = new Date(entry.createdAt).toLocaleDateString("zh-CN", {
@@ -113,7 +127,6 @@ const Notes = () => {
 
   return (
     <div className="min-h-screen bg-background pb-8">
-      {/* Header */}
       <div className="sticky top-0 bg-background/80 backdrop-blur-xl border-b border-border z-10">
         <div className="flex items-center justify-between px-4 py-3">
           <button onClick={() => navigate(-1)} className="w-8 h-8 rounded-xl bg-card border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
@@ -125,130 +138,59 @@ const Notes = () => {
       </div>
 
       <div className="px-6 pt-6 space-y-5">
-        {/* Title (editable) */}
         <div>
-          <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 block">
-            标题
-          </label>
-          <input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="笔记标题"
-            className="w-full bg-card border border-border rounded-2xl px-4 py-3.5 text-base font-display font-extrabold outline-none focus:ring-2 focus:ring-primary transition-all placeholder:text-muted-foreground shadow-sm"
-          />
+          <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 block">标题</label>
+          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="笔记标题" className="w-full bg-card border border-border rounded-2xl px-4 py-3.5 text-base font-display font-extrabold outline-none focus:ring-2 focus:ring-primary transition-all placeholder:text-muted-foreground shadow-sm" />
         </div>
 
-        {/* Date */}
         <p className="text-xs text-muted-foreground">{dateStr}</p>
 
-        {/* Show Name */}
         <div>
-          <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 block">
-            所属节目
-          </label>
-          <input
-            value={showName}
-            onChange={(e) => setShowName(e.target.value)}
-            placeholder="播客节目名称，如「硬地骇客」"
-            className="w-full bg-card border border-border rounded-2xl px-4 py-3.5 text-sm outline-none focus:ring-2 focus:ring-primary transition-all placeholder:text-muted-foreground shadow-sm"
-          />
+          <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 block">所属节目</label>
+          <input value={showName} onChange={(e) => setShowName(e.target.value)} placeholder="播客节目名称，如「硬地骇客」" className="w-full bg-card border border-border rounded-2xl px-4 py-3.5 text-sm outline-none focus:ring-2 focus:ring-primary transition-all placeholder:text-muted-foreground shadow-sm" />
         </div>
 
-        {/* Category */}
         <div>
-          <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 block">
-            分类
-          </label>
+          <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 block">分类</label>
           <div className="flex flex-wrap gap-2">
             {CATEGORIES.map((cat) => (
-              <button
-                key={cat}
-                type="button"
-                onClick={() => setCategory(category === cat ? "" : cat)}
-                className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
-                  category === cat
-                    ? "bg-primary text-primary-foreground border-primary"
-                    : "bg-card border-border text-muted-foreground hover:border-primary/30"
-                }`}
-              >
+              <button key={cat} type="button" onClick={() => setCategory(category === cat ? "" : cat)} className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${category === cat ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border text-muted-foreground hover:border-primary/30"}`}>
                 {cat}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Topic */}
         <div>
-          <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 block">
-            主题
-          </label>
-          <input
-            value={topic}
-            onChange={(e) => setTopic(e.target.value)}
-            placeholder="本期主题是什么？"
-            className="w-full bg-card border border-border rounded-2xl px-4 py-3.5 text-sm outline-none focus:ring-2 focus:ring-primary transition-all placeholder:text-muted-foreground shadow-sm"
-          />
+          <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 block">主题</label>
+          <input value={topic} onChange={(e) => setTopic(e.target.value)} placeholder="本期主题是什么？" className="w-full bg-card border border-border rounded-2xl px-4 py-3.5 text-sm outline-none focus:ring-2 focus:ring-primary transition-all placeholder:text-muted-foreground shadow-sm" />
         </div>
 
-        {/* Key Points */}
         <div>
-          <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 block">
-            要点（每行一条）
-          </label>
-          <textarea
-            value={keyPoints}
-            onChange={(e) => setKeyPoints(e.target.value)}
-            rows={5}
-            placeholder={"AI改变职业结构\nAGI仍需10年\n教育将被重塑"}
-            className="w-full bg-card border border-border rounded-2xl px-4 py-3.5 text-sm outline-none focus:ring-2 focus:ring-primary transition-all resize-none placeholder:text-muted-foreground shadow-sm"
-          />
+          <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 block">要点（每行一条）</label>
+          <textarea value={keyPoints} onChange={(e) => setKeyPoints(e.target.value)} rows={5} placeholder={"AI改变职业结构\nAGI仍需10年\n教育将被重塑"} className="w-full bg-card border border-border rounded-2xl px-4 py-3.5 text-sm outline-none focus:ring-2 focus:ring-primary transition-all resize-none placeholder:text-muted-foreground shadow-sm" />
         </div>
 
-        {/* Thoughts */}
         <div>
-          <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 block">
-            我的想法
-          </label>
-          <textarea
-            value={thoughts}
-            onChange={(e) => setThoughts(e.target.value)}
-            rows={3}
-            placeholder="听完有什么感想？"
-            className="w-full bg-card border border-border rounded-2xl px-4 py-3.5 text-sm outline-none focus:ring-2 focus:ring-primary transition-all resize-none placeholder:text-muted-foreground shadow-sm"
-          />
+          <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 block">我的想法</label>
+          <textarea value={thoughts} onChange={(e) => setThoughts(e.target.value)} rows={3} placeholder="听完有什么感想？" className="w-full bg-card border border-border rounded-2xl px-4 py-3.5 text-sm outline-none focus:ring-2 focus:ring-primary transition-all resize-none placeholder:text-muted-foreground shadow-sm" />
         </div>
 
-        {/* Rating */}
         <div>
-          <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3 block">
-            评分（点击左半边半星，右半边整星）
-          </label>
+          <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3 block">评分（点击左半边半星，右半边整星）</label>
           <StarRating rating={rating} onChange={setRating} />
         </div>
 
-        {/* Actions */}
-        <button
-          onClick={handleSave}
-          className="w-full bg-primary text-primary-foreground font-display font-bold py-3.5 rounded-2xl flex items-center justify-center gap-2 transition-all hover:brightness-110 shadow-md shadow-primary/20"
-        >
-          <Save size={18} />
-          保存笔记
+        <button onClick={handleSave} className="w-full bg-primary text-primary-foreground font-display font-bold py-3.5 rounded-2xl flex items-center justify-center gap-2 transition-all hover:brightness-110 shadow-md shadow-primary/20">
+          <Save size={18} /> 保存笔记
         </button>
 
         <div className="flex gap-3">
-          <button
-            onClick={handleCopy}
-            className="flex-1 bg-card border border-border text-foreground font-semibold py-3 rounded-2xl flex items-center justify-center gap-2 transition-all hover:shadow-md"
-          >
-            <Copy size={16} />
-            复制文本
+          <button onClick={handleCopy} className="flex-1 bg-card border border-border text-foreground font-semibold py-3 rounded-2xl flex items-center justify-center gap-2 transition-all hover:shadow-md">
+            <Copy size={16} /> 复制文本
           </button>
-          <button
-            onClick={handleShare}
-            className="flex-1 bg-card border border-border text-foreground font-semibold py-3 rounded-2xl flex items-center justify-center gap-2 transition-all hover:shadow-md"
-          >
-            <Share2 size={16} />
-            分享
+          <button onClick={handleShare} className="flex-1 bg-card border border-border text-foreground font-semibold py-3 rounded-2xl flex items-center justify-center gap-2 transition-all hover:shadow-md">
+            <Share2 size={16} /> 分享
           </button>
         </div>
       </div>
