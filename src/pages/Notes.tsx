@@ -12,6 +12,7 @@ const Notes = () => {
   const entry = getEntry(id!);
 
   const [showName, setShowName] = useState(entry?.showName || "");
+  const [category, setCategory] = useState<PodcastCategory | "">(entry?.category || "");
   const [topic, setTopic] = useState(entry?.notes?.topic || "");
   const [keyPoints, setKeyPoints] = useState(
     entry?.notes?.keyPoints?.join("\n") || ""
