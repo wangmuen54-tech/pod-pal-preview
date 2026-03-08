@@ -50,7 +50,9 @@ const ListenCalendar = () => {
     if (isFuture(date)) return;
     const key = format(date, "yyyy-MM-dd");
     setSelectedDate(key);
-    setInputMinutes(log[key]?.toString() || "");
+    const totalMins = log[key] || 0;
+    setInputH(Math.floor(totalMins / 60).toString());
+    setInputM((totalMins % 60).toString());
   };
 
   const handleSaveMinutes = () => {
