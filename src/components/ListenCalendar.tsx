@@ -1,12 +1,14 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { ChevronLeft, ChevronRight, Clock, CalendarDays, Pencil, Check } from "lucide-react";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, subMonths, addMonths, isSameMonth, isToday, isFuture } from "date-fns";
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, subMonths, addMonths, isToday, isFuture } from "date-fns";
 import { zhCN } from "date-fns/locale";
 import {
   getListenLog,
   logListening,
   getEffectiveStats,
   setListenStats,
+  type ListenLog,
+  type ListenStats,
 } from "@/lib/listenLog";
 import { toast } from "sonner";
 
@@ -26,16 +28,27 @@ const ListenCalendar = () => {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [inputH, setInputH] = useState("");
   const [inputM, setInputM] = useState("");
-  const [, setTick] = useState(0);
+
+  const [log, setLog] = useState<ListenLog>({});
+  const [stats, setStats] = useState<ListenStats>({ totalMinutes: 0, totalDays: 0 });
+  const [loading, setLoading] = useState(true);
 
   // Stats editing
   const [editingStats, setEditingStats] = useState(false);
-  const stats = getEffectiveStats();
-  const [editH, setEditH] = useState(Math.floor(stats.totalMinutes / 60));
-  const [editM, setEditM] = useState(stats.totalMinutes % 60);
-  const [editTotalDays, setEditTotalDays] = useState(stats.totalDays);
+  const [editH, setEditH] = useState(0);
+  const [editM, setEditM] = useState(0);
+  const [editTotalDays, setEditTotalDays] = useState(0);
 
-  const log = getListenLog();
+  const loadData = useCallback(async () => {
+    const [logData, statsData] = await Promise.all([getListenLog(), getEffectiveStats()]);
+    setLog(logData);
+    setStats(statsData);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const days = useMemo(() => {
     const start = startOfMonth(currentMonth);
@@ -54,39 +67,46 @@ const ListenCalendar = () => {
     setInputM((totalMins % 60).toString());
   };
 
-  const handleSaveMinutes = () => {
+  const handleSaveMinutes = async () => {
     if (!selectedDate) return;
     const mins = (parseInt(inputH) || 0) * 60 + (parseInt(inputM) || 0);
-    logListening(selectedDate, mins);
+    await logListening(selectedDate, mins);
     setSelectedDate(null);
     setInputH("");
     setInputM("");
     const h = Math.floor(mins / 60);
     const m = mins % 60;
     toast.success(mins > 0 ? `已记录 ${h}h${m}min` : "已清除记录");
-    setTick((t) => t + 1);
+    await loadData();
   };
 
-  const handleSaveStats = () => {
-    setListenStats({
+  const handleSaveStats = async () => {
+    await setListenStats({
       totalMinutes: (parseInt(editH.toString()) || 0) * 60 + (parseInt(editM.toString()) || 0),
       totalDays: editTotalDays,
     });
     setEditingStats(false);
     toast.success("已更新统计数据");
-    setTick((t) => t + 1);
+    await loadData();
   };
 
   const handleStartEditStats = () => {
-    const s = getEffectiveStats();
-    setEditH(Math.floor(s.totalMinutes / 60));
-    setEditM(s.totalMinutes % 60);
-    setEditTotalDays(s.totalDays);
+    setEditH(Math.floor(stats.totalMinutes / 60));
+    setEditM(stats.totalMinutes % 60);
+    setEditTotalDays(stats.totalDays);
     setEditingStats(true);
   };
 
   const totalHours = Math.floor(stats.totalMinutes / 60);
   const totalRemainingMins = stats.totalMinutes % 60;
+
+  if (loading) {
+    return (
+      <div className="bg-card border border-border rounded-2xl p-3 shadow-sm flex items-center justify-center min-h-[200px]">
+        <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="bg-card border border-border rounded-2xl p-3 shadow-sm">

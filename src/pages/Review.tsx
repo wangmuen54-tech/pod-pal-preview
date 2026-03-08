@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Brain, ChevronRight, Check, Calendar, Flame } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
-import { getEntry } from "@/lib/store";
+import { fetchEntry } from "@/lib/store";
 import { getDueReviews, getUpcomingReviews, markReviewed, type ReviewItem } from "@/lib/review";
+import type { PodcastEntry } from "@/lib/store";
 
 const weightColor = (w: number) => {
   if (w >= 70) return "text-red-500 bg-red-500/10";
@@ -11,10 +12,15 @@ const weightColor = (w: number) => {
   return "text-muted-foreground bg-muted";
 };
 
-const ReviewCard = ({ item, onReviewed }: { item: ReviewItem; onReviewed: () => void }) => {
+const ReviewCard = ({ item, onReviewed }: { item: ReviewItem & { entry?: PodcastEntry }; onReviewed: () => void }) => {
   const navigate = useNavigate();
-  const entry = getEntry(item.entryId);
+  const entry = item.entry;
   if (!entry) return null;
+
+  const handleReviewed = async () => {
+    await markReviewed(item.entryId);
+    onReviewed();
+  };
 
   return (
     <div className="bg-card border border-border rounded-2xl px-4 py-4 animate-fade-in">
@@ -58,10 +64,7 @@ const ReviewCard = ({ item, onReviewed }: { item: ReviewItem; onReviewed: () => 
           查看详情 <ChevronRight size={14} />
         </button>
         <button
-          onClick={() => {
-            markReviewed(item.entryId);
-            onReviewed();
-          }}
+          onClick={handleReviewed}
           className="flex-1 text-xs font-semibold py-2 rounded-xl bg-primary text-primary-foreground flex items-center justify-center gap-1 hover:brightness-110 transition-all"
         >
           <Check size={14} /> 已复习
@@ -72,11 +75,43 @@ const ReviewCard = ({ item, onReviewed }: { item: ReviewItem; onReviewed: () => 
 };
 
 const Review = () => {
-  const [, setTick] = useState(0);
-  const refresh = () => setTick((t) => t + 1);
+  const [dueItems, setDueItems] = useState<(ReviewItem & { entry?: PodcastEntry })[]>([]);
+  const [upcomingItems, setUpcomingItems] = useState<(ReviewItem & { entry?: PodcastEntry })[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const dueItems = getDueReviews();
-  const upcomingItems = getUpcomingReviews();
+  const loadData = async () => {
+    const [due, upcoming] = await Promise.all([getDueReviews(), getUpcomingReviews()]);
+    
+    // Fetch entries for all items
+    const allItems = [...due, ...upcoming];
+    const entryIds = [...new Set(allItems.map((i) => i.entryId))];
+    const entries = await Promise.all(entryIds.map((id) => fetchEntry(id)));
+    const entryMap = new Map(entries.filter(Boolean).map((e) => [e!.id, e!]));
+
+    setDueItems(due.map((i) => ({ ...i, entry: entryMap.get(i.entryId) })));
+    setUpcomingItems(upcoming.map((i) => ({ ...i, entry: entryMap.get(i.entryId) })));
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const refresh = () => loadData();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background pb-20">
+        <div className="px-6 pt-12 pb-6">
+          <h1 className="text-2xl font-display font-extrabold">复习</h1>
+        </div>
+        <div className="flex items-center justify-center py-12">
+          <div className="w-8 h-8 border-3 border-primary/30 border-t-primary rounded-full animate-spin" />
+        </div>
+        <BottomNav />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -86,7 +121,6 @@ const Review = () => {
       </div>
 
       <div className="px-6">
-        {/* Due Reviews */}
         {dueItems.length > 0 ? (
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-3">
@@ -111,7 +145,6 @@ const Review = () => {
           </div>
         )}
 
-        {/* Upcoming */}
         {upcomingItems.length > 0 && (
           <div>
             <div className="flex items-center gap-2 mb-3">
@@ -120,8 +153,7 @@ const Review = () => {
             </div>
             <div className="space-y-2">
               {upcomingItems.slice(0, 5).map((item) => {
-                const entry = getEntry(item.entryId);
-                if (!entry) return null;
+                if (!item.entry) return null;
                 const daysLeft = Math.ceil(
                   (new Date(item.nextReviewAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
                 );
@@ -131,7 +163,7 @@ const Review = () => {
                     className="bg-card/60 border border-border rounded-2xl px-4 py-3 flex items-center justify-between"
                   >
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-semibold truncate">{entry.title}</p>
+                      <p className="text-sm font-semibold truncate">{item.entry.title}</p>
                       <p className="text-xs text-muted-foreground">
                         {daysLeft} 天后 · 已复习 {item.reviewCount} 次
                       </p>
