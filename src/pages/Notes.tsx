@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Save } from "lucide-react";
-import { getEntry, saveEntry } from "@/lib/store";
+import { ArrowLeft, Save, Copy, Share2 } from "lucide-react";
+import { getEntry, saveEntry, type PodcastEntry } from "@/lib/store";
 import StarRating from "@/components/StarRating";
 import { toast } from "sonner";
 
@@ -33,6 +33,52 @@ const Notes = () => {
       </div>
     );
   }
+
+  const buildText = () => {
+    const stars = "⭐".repeat(rating) + "☆".repeat(5 - rating);
+    return [
+      `📻 ${entry.title}`,
+      "",
+      `📌 主题：${topic || "未填写"}`,
+      "",
+      "📝 要点：",
+      ...keyPoints
+        .split("\n")
+        .filter((p) => p.trim())
+        .map((p, i) => `  ${i + 1}. ${p.trim()}`),
+      "",
+      `💭 我的想法：${thoughts || "未填写"}`,
+      "",
+      `评分：${stars}`,
+      "",
+      `🔗 ${entry.url}`,
+      "",
+      "— via PodPrep",
+    ].join("\n");
+  };
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(buildText());
+      toast.success("已复制到剪贴板");
+    } catch {
+      toast.error("复制失败");
+    }
+  };
+
+  const handleShare = async () => {
+    const text = buildText();
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: entry.title, text });
+      } catch {
+        // user cancelled
+      }
+    } else {
+      await navigator.clipboard.writeText(text);
+      toast.success("已复制到剪贴板（当前浏览器不支持分享）");
+    }
+  };
 
   const handleSave = () => {
     const updatedEntry = {
@@ -114,7 +160,7 @@ const Notes = () => {
           <StarRating rating={rating} onChange={setRating} />
         </div>
 
-        {/* Save */}
+        {/* Actions */}
         <button
           onClick={handleSave}
           className="w-full bg-primary text-primary-foreground font-display font-semibold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all hover:brightness-110"
@@ -122,6 +168,23 @@ const Notes = () => {
           <Save size={18} />
           保存笔记
         </button>
+
+        <div className="flex gap-3">
+          <button
+            onClick={handleCopy}
+            className="flex-1 bg-secondary text-secondary-foreground font-medium py-3 rounded-xl flex items-center justify-center gap-2 transition-all hover:brightness-110"
+          >
+            <Copy size={16} />
+            复制文本
+          </button>
+          <button
+            onClick={handleShare}
+            className="flex-1 bg-secondary text-secondary-foreground font-medium py-3 rounded-xl flex items-center justify-center gap-2 transition-all hover:brightness-110"
+          >
+            <Share2 size={16} />
+            分享
+          </button>
+        </div>
       </div>
     </div>
   );
