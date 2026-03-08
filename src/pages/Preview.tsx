@@ -198,6 +198,7 @@ const Preview = () => {
         >
           <Headphones size={18} />
           去收听
+          <ExternalLink size={14} className="opacity-60" />
         </a>
 
         {/* Write Notes */}
