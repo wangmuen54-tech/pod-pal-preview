@@ -14,6 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
+      listen_logs: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          minutes: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          id?: string
+          minutes?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          minutes?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      listen_stats_override: {
+        Row: {
+          created_at: string
+          days_offset: number
+          id: string
+          minutes_offset: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          days_offset?: number
+          id?: string
+          minutes_offset?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          days_offset?: number
+          id?: string
+          minutes_offset?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       podcast_entries: {
         Row: {
           background: string | null
@@ -76,6 +130,50 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      review_items: {
+        Row: {
+          created_at: string
+          entry_id: string
+          id: string
+          last_reviewed_at: string | null
+          next_review_at: string
+          review_count: number
+          updated_at: string
+          user_id: string
+          weight: number
+        }
+        Insert: {
+          created_at?: string
+          entry_id: string
+          id?: string
+          last_reviewed_at?: string | null
+          next_review_at?: string
+          review_count?: number
+          updated_at?: string
+          user_id: string
+          weight?: number
+        }
+        Update: {
+          created_at?: string
+          entry_id?: string
+          id?: string
+          last_reviewed_at?: string | null
+          next_review_at?: string
+          review_count?: number
+          updated_at?: string
+          user_id?: string
+          weight?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_items_entry_id_fkey"
+            columns: ["entry_id"]
+            isOneToOne: false
+            referencedRelation: "podcast_entries"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
