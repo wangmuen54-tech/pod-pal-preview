@@ -189,10 +189,21 @@ const Preview = () => {
         <SectionCard icon={MessageCircle} title="争议与观点" items={entry.controversies || []} />
         <SectionCard icon={BookOpen} title="延伸阅读" items={entry.relatedResources || []} />
 
-        {/* Go Listen Button */}
+        {/* Go Listen */}
+        <a
+          href={entry.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full mt-4 bg-accent text-accent-foreground font-display font-bold py-3.5 rounded-2xl flex items-center justify-center gap-2 transition-all hover:brightness-110 shadow-sm"
+        >
+          <Headphones size={18} />
+          去收听
+        </a>
+
+        {/* Write Notes */}
         <button
           onClick={() => navigate(`/notes/${entry.id}`)}
-          className="w-full mt-4 bg-primary text-primary-foreground font-display font-bold py-3.5 rounded-2xl flex items-center justify-center gap-2 transition-all hover:brightness-110 shadow-md shadow-primary/20"
+          className="w-full mt-3 bg-primary text-primary-foreground font-display font-bold py-3.5 rounded-2xl flex items-center justify-center gap-2 transition-all hover:brightness-110 shadow-md shadow-primary/20"
         >
           <Headphones size={18} />
           听完做笔记
