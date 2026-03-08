@@ -83,37 +83,37 @@ const ListenCalendar = () => {
   const totalRemainingMins = stats.totalMinutes % 60;
 
   return (
-    <div className="bg-card border border-border rounded-2xl p-5 shadow-sm">
+    <div className="bg-card border border-border rounded-2xl p-3 shadow-sm">
       {/* Month Nav */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-2">
         <button
           onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-          className="w-8 h-8 rounded-xl bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+          className="w-6 h-6 rounded-lg bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
         >
-          <ChevronLeft size={16} />
+          <ChevronLeft size={14} />
         </button>
-        <span className="text-sm font-bold">
+        <span className="text-xs font-bold">
           {format(currentMonth, "yyyy年M月", { locale: zhCN })}
         </span>
         <button
           onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-          className="w-8 h-8 rounded-xl bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+          className="w-6 h-6 rounded-lg bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
         >
-          <ChevronRight size={16} />
+          <ChevronRight size={14} />
         </button>
       </div>
 
       {/* Weekday Headers */}
-      <div className="grid grid-cols-7 gap-1 mb-1">
+      <div className="grid grid-cols-7 gap-0.5 mb-0.5">
         {WEEKDAYS.map((d) => (
-          <div key={d} className="text-center text-xs text-muted-foreground font-semibold py-1">
+          <div key={d} className="text-center text-[10px] text-muted-foreground font-semibold py-0.5">
             {d}
           </div>
         ))}
       </div>
 
       {/* Days Grid */}
-      <div className="grid grid-cols-7 gap-1">
+      <div className="grid grid-cols-7 gap-0.5">
         {Array.from({ length: startPadding }).map((_, i) => (
           <div key={`pad-${i}`} className="aspect-square" />
         ))}
@@ -129,17 +129,17 @@ const ListenCalendar = () => {
               key={key}
               onClick={() => handleDayClick(day)}
               disabled={future}
-              className={`aspect-square rounded-lg text-xs font-semibold flex items-center justify-center transition-all relative ${
+              className={`aspect-square rounded text-[10px] font-semibold flex items-center justify-center transition-all relative ${
                 future
                   ? "text-muted-foreground/30 cursor-default"
                   : selected
-                    ? "ring-2 ring-primary ring-offset-1"
+                    ? "ring-1 ring-primary ring-offset-1"
                     : "hover:ring-1 hover:ring-primary/30"
               } ${getColorClass(mins)} ${mins > 0 ? "text-primary-foreground" : "text-foreground"}`}
             >
               {day.getDate()}
               {today && (
-                <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary" />
+                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0.5 h-0.5 rounded-full bg-primary" />
               )}
             </button>
           );
@@ -147,17 +147,17 @@ const ListenCalendar = () => {
       </div>
 
       {/* Legend */}
-      <div className="flex items-center justify-center gap-1.5 mt-3">
-        <span className="text-xs text-muted-foreground">少</span>
+      <div className="flex items-center justify-center gap-1 mt-2">
+        <span className="text-[10px] text-muted-foreground">少</span>
         {[0, 15, 30, 60, 90].map((m) => (
-          <div key={m} className={`w-3 h-3 rounded-sm ${getColorClass(m)}`} />
+          <div key={m} className={`w-2.5 h-2.5 rounded-sm ${getColorClass(m)}`} />
         ))}
-        <span className="text-xs text-muted-foreground">多</span>
+        <span className="text-[10px] text-muted-foreground">多</span>
       </div>
 
       {/* Input for selected date */}
       {selectedDate && (
-        <div className="mt-4 p-3 bg-muted rounded-xl animate-fade-in">
+        <div className="mt-3 p-2.5 bg-muted rounded-xl animate-fade-in">
           <p className="text-xs font-semibold text-muted-foreground mb-2">
             {selectedDate} 收听时长（分钟）
           </p>
@@ -182,9 +182,9 @@ const ListenCalendar = () => {
       )}
 
       {/* Stats */}
-      <div className="mt-4 flex gap-3">
-        <div className="flex-1 bg-muted rounded-xl p-3 text-center">
-          <Clock size={16} className="mx-auto text-primary mb-1" />
+      <div className="mt-3 flex gap-2">
+        <div className="flex-1 bg-muted rounded-lg p-2 text-center">
+          <Clock size={14} className="mx-auto text-primary mb-0.5" />
           {editingStats ? (
             <input
               type="number"
@@ -194,14 +194,14 @@ const ListenCalendar = () => {
               className="w-full text-center bg-card border border-border rounded-lg px-2 py-1 text-sm font-bold outline-none focus:ring-2 focus:ring-primary"
             />
           ) : (
-            <p className="text-sm font-bold">
+            <p className="text-xs font-bold">
               {totalHours > 0 ? `${totalHours}h${totalRemainingMins > 0 ? `${totalRemainingMins}m` : ""}` : `${stats.totalMinutes}m`}
             </p>
           )}
-          <p className="text-xs text-muted-foreground mt-0.5">总时长</p>
+          <p className="text-[10px] text-muted-foreground">总时长</p>
         </div>
-        <div className="flex-1 bg-muted rounded-xl p-3 text-center">
-          <CalendarDays size={16} className="mx-auto text-primary mb-1" />
+        <div className="flex-1 bg-muted rounded-lg p-2 text-center">
+          <CalendarDays size={14} className="mx-auto text-primary mb-0.5" />
           {editingStats ? (
             <input
               type="number"
@@ -211,9 +211,9 @@ const ListenCalendar = () => {
               className="w-full text-center bg-card border border-border rounded-lg px-2 py-1 text-sm font-bold outline-none focus:ring-2 focus:ring-primary"
             />
           ) : (
-            <p className="text-sm font-bold">{stats.totalDays}</p>
+            <p className="text-xs font-bold">{stats.totalDays}</p>
           )}
-          <p className="text-xs text-muted-foreground mt-0.5">收听天数</p>
+          <p className="text-[10px] text-muted-foreground">收听天数</p>
         </div>
       </div>
 
