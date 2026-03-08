@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 export const CATEGORIES = [
   "AI",
   "自我成长",
+  "职业发展",
   "阅读类",
   "影视娱乐",
   "商业政治",
