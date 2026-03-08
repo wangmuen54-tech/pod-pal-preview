@@ -109,14 +109,20 @@ ${pageContent.slice(0, 8000)}`
                 type: 'object',
                 properties: {
                   title: { type: 'string', description: '播客标题（简短有力）' },
-                  brief: { type: 'string', description: '30秒速览，3-4句话概括本期核心内容' },
+                  brief: { type: 'string', description: '30秒速览，3-4句话概括本期核心内容，让人快速了解这期在讲什么' },
+                  background: { type: 'string', description: '背景知识，150-250字，介绍理解本期播客所需的前置知识和大背景' },
+                  listenGuide: {
+                    type: 'array',
+                    items: { type: 'string' },
+                    description: '收听指南：3-5个带着去听的思考问题，帮助听众主动思考',
+                  },
                   keyPeople: {
                     type: 'array',
                     items: {
                       type: 'object',
                       properties: {
                         name: { type: 'string', description: '人物名称' },
-                        description: { type: 'string', description: '一句话介绍此人及其与本期内容的关联' },
+                        description: { type: 'string', description: '2-3句话介绍此人背景及其与本期内容的关联' },
                       },
                       required: ['name', 'description'],
                       additionalProperties: false,
@@ -129,7 +135,7 @@ ${pageContent.slice(0, 8000)}`
                       type: 'object',
                       properties: {
                         name: { type: 'string', description: '概念名称' },
-                        description: { type: 'string', description: '简明解释这个概念' },
+                        description: { type: 'string', description: '用通俗语言解释这个概念，包含为什么它重要' },
                       },
                       required: ['name', 'description'],
                       additionalProperties: false,
@@ -142,12 +148,38 @@ ${pageContent.slice(0, 8000)}`
                       type: 'object',
                       properties: {
                         name: { type: 'string', description: '事件名称（含时间）' },
-                        description: { type: 'string', description: '事件简要说明' },
+                        description: { type: 'string', description: '事件简要说明及影响' },
                       },
                       required: ['name', 'description'],
                       additionalProperties: false,
                     },
                     description: '关键事件列表（1-4个）',
+                  },
+                  controversies: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        name: { type: 'string', description: '争议话题名称' },
+                        description: { type: 'string', description: '不同观点和立场的简要说明' },
+                      },
+                      required: ['name', 'description'],
+                      additionalProperties: false,
+                    },
+                    description: '争议与不同观点（1-3个，如果有的话）',
+                  },
+                  relatedResources: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        name: { type: 'string', description: '资源名称（书籍、文章、视频等）' },
+                        description: { type: 'string', description: '简要说明为什么推荐这个资源' },
+                      },
+                      required: ['name', 'description'],
+                      additionalProperties: false,
+                    },
+                    description: '延伸阅读/推荐资源（2-4个）',
                   },
                 },
                 required: ['title', 'brief', 'keyPeople', 'keyConcepts', 'keyEvents'],
