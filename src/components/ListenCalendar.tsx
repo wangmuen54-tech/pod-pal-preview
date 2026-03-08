@@ -157,7 +157,7 @@ const ListenCalendar = () => {
 
       {/* Input for selected date */}
       {selectedDate && (
-        <div className="mt-4 p-3 bg-muted rounded-xl animate-fade-in">
+        <div className="mt-3 p-2.5 bg-muted rounded-xl animate-fade-in">
           <p className="text-xs font-semibold text-muted-foreground mb-2">
             {selectedDate} 收听时长（分钟）
           </p>
