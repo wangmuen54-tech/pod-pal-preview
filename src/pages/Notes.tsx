@@ -92,8 +92,9 @@ const Notes = () => {
       },
     };
     saveEntry(updatedEntry);
+    upsertReviewItem(updatedEntry);
     toast.success("笔记已保存");
-    navigate("/history");
+    navigate("/notes-list");
   };
 
   return (
