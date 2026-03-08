@@ -160,7 +160,7 @@ const Notes = () => {
           <StarRating rating={rating} onChange={setRating} />
         </div>
 
-        {/* Save */}
+        {/* Actions */}
         <button
           onClick={handleSave}
           className="w-full bg-primary text-primary-foreground font-display font-semibold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all hover:brightness-110"
@@ -168,6 +168,23 @@ const Notes = () => {
           <Save size={18} />
           保存笔记
         </button>
+
+        <div className="flex gap-3">
+          <button
+            onClick={handleCopy}
+            className="flex-1 bg-secondary text-secondary-foreground font-medium py-3 rounded-xl flex items-center justify-center gap-2 transition-all hover:brightness-110"
+          >
+            <Copy size={16} />
+            复制文本
+          </button>
+          <button
+            onClick={handleShare}
+            className="flex-1 bg-secondary text-secondary-foreground font-medium py-3 rounded-xl flex items-center justify-center gap-2 transition-all hover:brightness-110"
+          >
+            <Share2 size={16} />
+            分享
+          </button>
+        </div>
       </div>
     </div>
   );
