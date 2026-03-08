@@ -1,3 +1,4 @@
+import { supabase } from "@/integrations/supabase/client";
 import { type PodcastEntry } from "./store";
 
 // Ebbinghaus forgetting curve intervals (in days)
@@ -5,102 +6,149 @@ const REVIEW_INTERVALS = [1, 2, 4, 7, 15, 30, 60];
 
 export interface ReviewItem {
   entryId: string;
-  weight: number; // 0-100, auto-calculated
-  nextReviewAt: string; // ISO date
+  weight: number;
+  nextReviewAt: string;
   reviewCount: number;
   lastReviewedAt?: string;
 }
 
-const REVIEW_KEY = "podprep_reviews";
+// ---- DB helpers ----
 
-export function getReviewItems(): ReviewItem[] {
-  try {
-    const data = localStorage.getItem(REVIEW_KEY);
-    return data ? JSON.parse(data) : [];
-  } catch {
-    return [];
-  }
-}
-
-function saveReviewItems(items: ReviewItem[]) {
-  localStorage.setItem(REVIEW_KEY, JSON.stringify(items));
+function dbToReviewItem(row: any): ReviewItem {
+  return {
+    entryId: row.entry_id,
+    weight: row.weight,
+    nextReviewAt: row.next_review_at,
+    reviewCount: row.review_count,
+    lastReviewedAt: row.last_reviewed_at || undefined,
+  };
 }
 
 /** Auto-calculate weight based on note richness */
 export function calculateWeight(entry: PodcastEntry): number {
   if (!entry.notes) return 0;
   let score = 0;
-  // Rating contributes 0-40
   score += (entry.notes.rating || 0) * 8;
-  // Key points count: each point adds 8, max 30
   const pointCount = entry.notes.keyPoints?.length || 0;
   score += Math.min(pointCount * 8, 30);
-  // Has topic: +10
   if (entry.notes.topic?.trim()) score += 10;
-  // Has thoughts: +20
   if (entry.notes.thoughts?.trim()) score += 20;
   return Math.min(score, 100);
 }
 
+/** Fetch all review items for current user */
+export async function fetchReviewItems(): Promise<ReviewItem[]> {
+  const { data, error } = await supabase
+    .from("review_items")
+    .select("*")
+    .order("next_review_at", { ascending: true });
+
+  if (error) {
+    console.error("Failed to fetch review items:", error);
+    return [];
+  }
+  return (data || []).map(dbToReviewItem);
+}
+
 /** Create or update a review item when notes are saved */
-export function upsertReviewItem(entry: PodcastEntry) {
-  const items = getReviewItems();
+export async function upsertReviewItem(entry: PodcastEntry): Promise<void> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+
   const weight = calculateWeight(entry);
 
-  // Don't schedule reviews for very low weight items
   if (weight < 20) {
     // Remove if exists
-    const filtered = items.filter((r) => r.entryId !== entry.id);
-    saveReviewItems(filtered);
+    await supabase
+      .from("review_items")
+      .delete()
+      .eq("user_id", user.id)
+      .eq("entry_id", entry.id);
     return;
   }
 
-  const existing = items.find((r) => r.entryId === entry.id);
+  // Check if exists
+  const { data: existing } = await supabase
+    .from("review_items")
+    .select("id")
+    .eq("user_id", user.id)
+    .eq("entry_id", entry.id)
+    .maybeSingle();
+
   if (existing) {
-    existing.weight = weight;
-    saveReviewItems(items);
+    await supabase
+      .from("review_items")
+      .update({ weight, updated_at: new Date().toISOString() })
+      .eq("id", existing.id);
   } else {
     const nextReview = new Date();
     nextReview.setDate(nextReview.getDate() + REVIEW_INTERVALS[0]);
-    items.push({
-      entryId: entry.id,
+    await supabase.from("review_items").insert({
+      user_id: user.id,
+      entry_id: entry.id,
       weight,
-      nextReviewAt: nextReview.toISOString(),
-      reviewCount: 0,
+      next_review_at: nextReview.toISOString(),
+      review_count: 0,
     });
-    saveReviewItems(items);
   }
 }
 
 /** Mark an item as reviewed and schedule next review */
-export function markReviewed(entryId: string) {
-  const items = getReviewItems();
-  const item = items.find((r) => r.entryId === entryId);
+export async function markReviewed(entryId: string): Promise<void> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+
+  const { data: item } = await supabase
+    .from("review_items")
+    .select("*")
+    .eq("user_id", user.id)
+    .eq("entry_id", entryId)
+    .maybeSingle();
+
   if (!item) return;
 
-  item.reviewCount += 1;
-  item.lastReviewedAt = new Date().toISOString();
-
-  const intervalIndex = Math.min(item.reviewCount, REVIEW_INTERVALS.length - 1);
+  const newCount = item.review_count + 1;
+  const intervalIndex = Math.min(newCount, REVIEW_INTERVALS.length - 1);
   const nextReview = new Date();
   nextReview.setDate(nextReview.getDate() + REVIEW_INTERVALS[intervalIndex]);
-  item.nextReviewAt = nextReview.toISOString();
 
-  saveReviewItems(items);
+  await supabase
+    .from("review_items")
+    .update({
+      review_count: newCount,
+      last_reviewed_at: new Date().toISOString(),
+      next_review_at: nextReview.toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", item.id);
 }
 
 /** Get items due for review today, sorted by weight (highest first) */
-export function getDueReviews(): ReviewItem[] {
-  const now = new Date();
-  return getReviewItems()
-    .filter((r) => new Date(r.nextReviewAt) <= now)
-    .sort((a, b) => b.weight - a.weight);
+export async function getDueReviews(): Promise<ReviewItem[]> {
+  const { data, error } = await supabase
+    .from("review_items")
+    .select("*")
+    .lte("next_review_at", new Date().toISOString())
+    .order("weight", { ascending: false });
+
+  if (error) {
+    console.error("Failed to fetch due reviews:", error);
+    return [];
+  }
+  return (data || []).map(dbToReviewItem);
 }
 
 /** Get upcoming reviews (not yet due) */
-export function getUpcomingReviews(): ReviewItem[] {
-  const now = new Date();
-  return getReviewItems()
-    .filter((r) => new Date(r.nextReviewAt) > now)
-    .sort((a, b) => new Date(a.nextReviewAt).getTime() - new Date(b.nextReviewAt).getTime());
+export async function getUpcomingReviews(): Promise<ReviewItem[]> {
+  const { data, error } = await supabase
+    .from("review_items")
+    .select("*")
+    .gt("next_review_at", new Date().toISOString())
+    .order("next_review_at", { ascending: true });
+
+  if (error) {
+    console.error("Failed to fetch upcoming reviews:", error);
+    return [];
+  }
+  return (data || []).map(dbToReviewItem);
 }

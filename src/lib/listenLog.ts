@@ -1,4 +1,4 @@
-const LISTEN_LOG_KEY = "podprep_listen_log";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface ListenLog {
   [date: string]: number; // date "YYYY-MM-DD" -> minutes
@@ -9,31 +9,62 @@ export interface ListenStats {
   totalDays: number;
 }
 
-export function getListenLog(): ListenLog {
-  try {
-    const data = localStorage.getItem(LISTEN_LOG_KEY);
-    return data ? JSON.parse(data) : {};
-  } catch {
+/** Fetch all listen logs for current user */
+export async function getListenLog(): Promise<ListenLog> {
+  const { data, error } = await supabase
+    .from("listen_logs")
+    .select("date, minutes");
+
+  if (error) {
+    console.error("Failed to fetch listen logs:", error);
     return {};
   }
-}
 
-function saveListenLog(log: ListenLog) {
-  localStorage.setItem(LISTEN_LOG_KEY, JSON.stringify(log));
-}
-
-export function logListening(date: string, minutes: number) {
-  const log = getListenLog();
-  if (minutes <= 0) {
-    delete log[date];
-  } else {
-    log[date] = minutes;
+  const log: ListenLog = {};
+  for (const row of data || []) {
+    log[row.date] = row.minutes;
   }
-  saveListenLog(log);
+  return log;
 }
 
-export function getListenStats(): ListenStats {
-  const log = getListenLog();
+/** Log listening time for a specific date */
+export async function logListening(date: string, minutes: number): Promise<void> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+
+  if (minutes <= 0) {
+    await supabase
+      .from("listen_logs")
+      .delete()
+      .eq("user_id", user.id)
+      .eq("date", date);
+  } else {
+    // Upsert
+    const { data: existing } = await supabase
+      .from("listen_logs")
+      .select("id")
+      .eq("user_id", user.id)
+      .eq("date", date)
+      .maybeSingle();
+
+    if (existing) {
+      await supabase
+        .from("listen_logs")
+        .update({ minutes, updated_at: new Date().toISOString() })
+        .eq("id", existing.id);
+    } else {
+      await supabase.from("listen_logs").insert({
+        user_id: user.id,
+        date,
+        minutes,
+      });
+    }
+  }
+}
+
+/** Get computed stats from listen logs */
+export async function getListenStats(): Promise<ListenStats> {
+  const log = await getListenLog();
   const entries = Object.values(log).filter((m) => m > 0);
   return {
     totalMinutes: entries.reduce((s, m) => s + m, 0),
@@ -41,34 +72,68 @@ export function getListenStats(): ListenStats {
   };
 }
 
-export function setListenStats(stats: Partial<ListenStats>) {
-  const OVERRIDE_KEY = "podprep_listen_stats_override";
-  const computed = getListenStats();
-  const existing = JSON.parse(localStorage.getItem(OVERRIDE_KEY) || "{}");
-  const override: Record<string, number> = { ...existing };
+/** Set stats override (offset-based) */
+export async function setListenStats(stats: Partial<ListenStats>): Promise<void> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+
+  const computed = await getListenStats();
+  const overrideData: { minutes_offset?: number; days_offset?: number } = {};
+
   if (stats.totalMinutes !== undefined) {
-    override.minutesOffset = stats.totalMinutes - computed.totalMinutes;
+    overrideData.minutes_offset = stats.totalMinutes - computed.totalMinutes;
   }
   if (stats.totalDays !== undefined) {
-    override.daysOffset = stats.totalDays - computed.totalDays;
+    overrideData.days_offset = stats.totalDays - computed.totalDays;
   }
-  localStorage.setItem(OVERRIDE_KEY, JSON.stringify(override));
+
+  const { data: existing } = await supabase
+    .from("listen_stats_override")
+    .select("id, minutes_offset, days_offset")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (existing) {
+    await supabase
+      .from("listen_stats_override")
+      .update({
+        minutes_offset: overrideData.minutes_offset ?? existing.minutes_offset,
+        days_offset: overrideData.days_offset ?? existing.days_offset,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", existing.id);
+  } else {
+    await supabase.from("listen_stats_override").insert({
+      user_id: user.id,
+      minutes_offset: overrideData.minutes_offset ?? 0,
+      days_offset: overrideData.days_offset ?? 0,
+    });
+  }
 }
 
-export function getEffectiveStats(): ListenStats {
-  const computed = getListenStats();
-  const OVERRIDE_KEY = "podprep_listen_stats_override";
-  try {
-    const override = JSON.parse(localStorage.getItem(OVERRIDE_KEY) || "{}");
+/** Get effective stats (computed + override offsets) */
+export async function getEffectiveStats(): Promise<ListenStats> {
+  const computed = await getListenStats();
+
+  const { data: override } = await supabase
+    .from("listen_stats_override")
+    .select("minutes_offset, days_offset")
+    .maybeSingle();
+
+  if (override) {
     return {
-      totalMinutes: computed.totalMinutes + (override.minutesOffset ?? 0),
-      totalDays: computed.totalDays + (override.daysOffset ?? 0),
+      totalMinutes: computed.totalMinutes + (override.minutes_offset ?? 0),
+      totalDays: computed.totalDays + (override.days_offset ?? 0),
     };
-  } catch {
-    return computed;
   }
+  return computed;
 }
 
-export function clearStatsOverride() {
-  localStorage.removeItem("podprep_listen_stats_override");
+export async function clearStatsOverride(): Promise<void> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+  await supabase
+    .from("listen_stats_override")
+    .delete()
+    .eq("user_id", user.id);
 }
