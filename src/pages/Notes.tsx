@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Save, Copy, Share2 } from "lucide-react";
-import { getEntry, saveEntry, CATEGORIES, type PodcastEntry, type PodcastCategory } from "@/lib/store";
+import { getEntry, saveEntry, CATEGORIES, type PodcastCategory } from "@/lib/store";
 import { upsertReviewItem } from "@/lib/review";
 import StarRating from "@/components/StarRating";
 import { toast } from "sonner";
@@ -11,6 +11,7 @@ const Notes = () => {
   const navigate = useNavigate();
   const entry = getEntry(id!);
 
+  const [title, setTitle] = useState(entry?.title || "");
   const [showName, setShowName] = useState(entry?.showName || "");
   const [category, setCategory] = useState<PodcastCategory | "">(entry?.category || "");
   const [topic, setTopic] = useState(entry?.notes?.topic || "");
@@ -38,9 +39,11 @@ const Notes = () => {
   }
 
   const buildText = () => {
-    const stars = "⭐".repeat(rating) + "☆".repeat(5 - rating);
+    const fullStars = Math.floor(rating);
+    const hasHalf = rating % 1 !== 0;
+    const stars = "⭐".repeat(fullStars) + (hasHalf ? "½" : "") + "☆".repeat(5 - Math.ceil(rating));
     return [
-      `📻 ${entry.title}`,
+      `📻 ${title}`,
       "",
       `📌 主题：${topic || "未填写"}`,
       "",
@@ -73,7 +76,7 @@ const Notes = () => {
     const text = buildText();
     if (navigator.share) {
       try {
-        await navigator.share({ title: entry.title, text });
+        await navigator.share({ title, text });
       } catch {
         // user cancelled
       }
@@ -86,6 +89,7 @@ const Notes = () => {
   const handleSave = () => {
     const updatedEntry = {
       ...entry,
+      title: title.trim() || entry.title,
       showName: showName.trim() || entry.showName,
       category: category || undefined,
       notes: {
@@ -101,6 +105,12 @@ const Notes = () => {
     navigate("/notes-list");
   };
 
+  const dateStr = new Date(entry.createdAt).toLocaleDateString("zh-CN", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
   return (
     <div className="min-h-screen bg-background pb-8">
       {/* Header */}
@@ -115,7 +125,21 @@ const Notes = () => {
       </div>
 
       <div className="px-6 pt-6 space-y-5">
-        <h1 className="text-xl font-display font-extrabold">{entry.title}</h1>
+        {/* Title (editable) */}
+        <div>
+          <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 block">
+            标题
+          </label>
+          <input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="笔记标题"
+            className="w-full bg-card border border-border rounded-2xl px-4 py-3.5 text-base font-display font-extrabold outline-none focus:ring-2 focus:ring-primary transition-all placeholder:text-muted-foreground shadow-sm"
+          />
+        </div>
+
+        {/* Date */}
+        <p className="text-xs text-muted-foreground">{dateStr}</p>
 
         {/* Show Name */}
         <div>
@@ -197,7 +221,7 @@ const Notes = () => {
         {/* Rating */}
         <div>
           <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3 block">
-            评分
+            评分（点击左半边半星，右半边整星）
           </label>
           <StarRating rating={rating} onChange={setRating} />
         </div>
