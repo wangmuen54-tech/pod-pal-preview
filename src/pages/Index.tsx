@@ -54,10 +54,11 @@ const Index = () => {
       <div className="absolute top-6 -right-4 w-20 h-20 rounded-full bg-accent/20" />
       <div className="absolute top-64 -left-10 w-28 h-28 rounded-full bg-primary/10" />
 
-      <div className="relative px-6 pt-10 pb-4">
+      {/* Header */}
+      <div className="relative px-6 pt-10 pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3 mb-1">
-            <img src={cuteBear} alt="PodPrep mascot" className="w-16 h-16 drop-shadow-md" />
+            <img src={cuteBear} alt="PodPrep mascot" className="w-14 h-14 drop-shadow-md" />
             <div>
               <h1 className="text-2xl font-display font-extrabold text-foreground">PodPrep</h1>
               <p className="text-muted-foreground text-xs">AI 播客预习助手</p>
@@ -73,37 +74,35 @@ const Index = () => {
         </div>
       </div>
 
-      <div className="px-6 mb-6">
-        <div className="space-y-3">
-          {actions.map(({ icon: Icon, label, desc, path, color, badge }) => (
+      {/* Listen Calendar (stats on top inside component) */}
+      <div className="px-6 mb-4">
+        <ListenCalendar />
+      </div>
+
+      {/* Compact Action Buttons */}
+      <div className="px-6 mb-4">
+        <div className="flex gap-2">
+          {actions.map(({ icon: Icon, label, path, color, badge }) => (
             <button
               key={path}
               onClick={() => navigate(path)}
-              className="w-full bg-card border border-border rounded-2xl px-4 py-4 flex items-center gap-4 text-left transition-all hover:shadow-md hover:border-primary/20"
+              className="flex-1 bg-card border border-border rounded-xl px-3 py-3 flex flex-col items-center gap-1.5 text-center transition-all hover:shadow-md hover:border-primary/20 relative"
             >
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${color}`}>
-                <Icon size={20} />
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${color}`}>
+                <Icon size={16} />
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-bold text-sm">{label}</p>
-                <p className="text-xs text-muted-foreground">{desc}</p>
-              </div>
+              <p className="font-bold text-xs">{label}</p>
               {badge && (
-                <span className="bg-destructive text-destructive-foreground text-xs font-bold px-2 py-0.5 rounded-full">
+                <span className="absolute -top-1.5 -right-1.5 bg-destructive text-destructive-foreground text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
                   {badge}
                 </span>
               )}
-              <ChevronRight size={16} className="text-muted-foreground shrink-0" />
             </button>
           ))}
         </div>
       </div>
 
-      {/* Listen Calendar */}
-      <div className="px-6 mb-6">
-        <ListenCalendar />
-      </div>
-
+      {/* Recent */}
       {recent.length > 0 && (
         <div className="px-6">
           <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-3">
