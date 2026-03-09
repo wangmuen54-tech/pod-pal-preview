@@ -74,9 +74,6 @@ const NotesList = () => {
         <p className="text-muted-foreground text-xs mt-1">{entries.length} 篇笔记</p>
       </div>
 
-      <div className="px-6 mb-5">
-        <ListenCalendar />
-      </div>
 
       <div className="px-6 mb-3">
         <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
