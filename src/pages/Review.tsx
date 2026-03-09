@@ -148,6 +148,12 @@ const Review = () => {
             </div>
             <p className="text-sm font-semibold text-foreground">今天的复习都完成啦！</p>
             <p className="text-xs text-muted-foreground mt-1">保持学习节奏 📚</p>
+            {tomorrowCount > 0 && (
+              <div className="mt-4 inline-flex items-center gap-1.5 bg-accent/10 text-accent-foreground px-4 py-2 rounded-xl">
+                <Calendar size={14} className="text-primary" />
+                <span className="text-xs font-semibold">明天有 {tomorrowCount} 篇待复习</span>
+              </div>
+            )}
           </div>
         )}
 
