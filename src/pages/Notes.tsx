@@ -4,7 +4,6 @@ import { ArrowLeft, Save, Copy, Share2 } from "lucide-react";
 import { fetchEntry, saveEntryToDb, CATEGORIES, type PodcastCategory } from "@/lib/store";
 import { upsertReviewItem } from "@/lib/review";
 import StarRating from "@/components/StarRating";
-import FormatToolbar from "@/components/FormatToolbar";
 import { toast } from "sonner";
 import type { PodcastEntry } from "@/lib/store";
 
