@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Sparkles, PenLine, Brain, ChevronRight, LogOut } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
+import ListenCalendar from "@/components/ListenCalendar";
 import { fetchEntries, type PodcastEntry } from "@/lib/store";
 import { getDueReviews } from "@/lib/review";
 import { useAuth } from "@/contexts/AuthContext";
@@ -96,6 +97,11 @@ const Index = () => {
             </button>
           ))}
         </div>
+      </div>
+
+      {/* Listen Calendar */}
+      <div className="px-6 mb-6">
+        <ListenCalendar />
       </div>
 
       {recent.length > 0 && (
