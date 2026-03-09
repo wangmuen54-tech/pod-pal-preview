@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Sparkles, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
 import BottomNav from "@/components/BottomNav";
 import { fetchEntries, generatePreview, saveEntryToDb, type PodcastEntry } from "@/lib/store";
 
@@ -12,7 +13,14 @@ const AIPreview = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchEntries().then((entries) => setRecentPreviews(entries.slice(0, 5)));
+    fetchEntries().then((entries) => {
+      const sorted = [...entries].sort((a, b) => {
+        const aHas = a.notes ? 1 : 0;
+        const bHas = b.notes ? 1 : 0;
+        return aHas - bHas;
+      });
+      setRecentPreviews(sorted.slice(0, 10));
+    });
   }, []);
 
   const handleGenerate = async () => {
@@ -72,21 +80,31 @@ const AIPreview = () => {
             最近预习
           </h2>
           <div className="space-y-2">
-            {recentPreviews.map((entry) => (
-              <button
-                key={entry.id}
-                onClick={() => navigate(`/preview/${entry.id}`)}
-                className="w-full bg-card border border-border rounded-2xl px-4 py-3.5 flex items-center justify-between text-left transition-all hover:shadow-md hover:border-primary/30 animate-fade-in"
-              >
-                <div className="min-w-0">
-                  <p className="font-semibold text-sm truncate">{entry.title}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    {new Date(entry.createdAt).toLocaleDateString("zh-CN")}
-                  </p>
-                </div>
-                <ChevronRight size={16} className="text-muted-foreground shrink-0" />
-              </button>
-            ))}
+            {recentPreviews.map((entry) => {
+              const hasNotes = !!entry.notes;
+              return (
+                <button
+                  key={entry.id}
+                  onClick={() => navigate(`/preview/${entry.id}`)}
+                  className="w-full bg-card border border-border rounded-2xl px-4 py-3.5 flex items-center justify-between text-left transition-all hover:shadow-md hover:border-primary/30 animate-fade-in"
+                >
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="font-semibold text-sm truncate">{entry.title}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-muted-foreground">
+                        {new Date(entry.createdAt).toLocaleDateString("zh-CN")}
+                      </span>
+                      <Badge variant={hasNotes ? "default" : "outline"} className="text-[10px] px-1.5 py-0">
+                        {hasNotes ? "已做笔记" : "未做笔记"}
+                      </Badge>
+                    </div>
+                  </div>
+                  <ChevronRight size={16} className="text-muted-foreground shrink-0" />
+                </button>
+              );
+            })}
           </div>
         </div>
       )}
