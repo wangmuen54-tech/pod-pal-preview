@@ -110,6 +110,75 @@ const ListenCalendar = () => {
 
   return (
     <div className="bg-card border border-border rounded-2xl p-3 shadow-sm">
+      {/* Stats at top */}
+      <div className="flex gap-2 mb-3">
+        <div className="flex-1 bg-muted rounded-lg p-2 text-center">
+          <Clock size={14} className="mx-auto text-primary mb-0.5" />
+          {editingStats ? (
+            <div className="flex items-center justify-center gap-1">
+              <input
+                type="number"
+                min="0"
+                value={editH}
+                onChange={(e) => setEditH(parseInt(e.target.value) || 0)}
+                className="w-10 text-center bg-card border border-border rounded px-1 py-0.5 text-xs font-bold outline-none focus:ring-1 focus:ring-primary"
+              />
+              <span className="text-[10px] text-muted-foreground">h</span>
+              <input
+                type="number"
+                min="0"
+                max="59"
+                value={editM}
+                onChange={(e) => setEditM(parseInt(e.target.value) || 0)}
+                className="w-10 text-center bg-card border border-border rounded px-1 py-0.5 text-xs font-bold outline-none focus:ring-1 focus:ring-primary"
+              />
+              <span className="text-[10px] text-muted-foreground">min</span>
+            </div>
+          ) : (
+            <p className="text-xs font-bold">
+              {totalHours}h{totalRemainingMins}min
+            </p>
+          )}
+          <p className="text-[10px] text-muted-foreground">总时长</p>
+        </div>
+        <div className="flex-1 bg-muted rounded-lg p-2 text-center">
+          <CalendarDays size={14} className="mx-auto text-primary mb-0.5" />
+          {editingStats ? (
+            <input
+              type="number"
+              min="0"
+              value={editTotalDays}
+              onChange={(e) => setEditTotalDays(parseInt(e.target.value) || 0)}
+              className="w-full text-center bg-card border border-border rounded-lg px-2 py-1 text-sm font-bold outline-none focus:ring-2 focus:ring-primary"
+            />
+          ) : (
+            <p className="text-xs font-bold">{stats.totalDays}</p>
+          )}
+          <p className="text-[10px] text-muted-foreground">收听天数</p>
+        </div>
+      </div>
+
+      {/* Edit stats button */}
+      <div className="mb-3 flex justify-center">
+        {editingStats ? (
+          <button
+            onClick={handleSaveStats}
+            className="flex items-center gap-1 text-xs text-primary font-semibold hover:underline"
+          >
+            <Check size={12} />
+            保存修改
+          </button>
+        ) : (
+          <button
+            onClick={handleStartEditStats}
+            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
+          >
+            <Pencil size={12} />
+            手动修改统计
+          </button>
+        )}
+      </div>
+
       {/* Month Nav */}
       <div className="flex items-center justify-between mb-2">
         <button
@@ -217,75 +286,6 @@ const ListenCalendar = () => {
           </div>
         </div>
       )}
-
-      {/* Stats */}
-      <div className="mt-3 flex gap-2">
-        <div className="flex-1 bg-muted rounded-lg p-2 text-center">
-          <Clock size={14} className="mx-auto text-primary mb-0.5" />
-          {editingStats ? (
-            <div className="flex items-center justify-center gap-1">
-              <input
-                type="number"
-                min="0"
-                value={editH}
-                onChange={(e) => setEditH(parseInt(e.target.value) || 0)}
-                className="w-10 text-center bg-card border border-border rounded px-1 py-0.5 text-xs font-bold outline-none focus:ring-1 focus:ring-primary"
-              />
-              <span className="text-[10px] text-muted-foreground">h</span>
-              <input
-                type="number"
-                min="0"
-                max="59"
-                value={editM}
-                onChange={(e) => setEditM(parseInt(e.target.value) || 0)}
-                className="w-10 text-center bg-card border border-border rounded px-1 py-0.5 text-xs font-bold outline-none focus:ring-1 focus:ring-primary"
-              />
-              <span className="text-[10px] text-muted-foreground">min</span>
-            </div>
-          ) : (
-            <p className="text-xs font-bold">
-              {totalHours}h{totalRemainingMins}min
-            </p>
-          )}
-          <p className="text-[10px] text-muted-foreground">总时长</p>
-        </div>
-        <div className="flex-1 bg-muted rounded-lg p-2 text-center">
-          <CalendarDays size={14} className="mx-auto text-primary mb-0.5" />
-          {editingStats ? (
-            <input
-              type="number"
-              min="0"
-              value={editTotalDays}
-              onChange={(e) => setEditTotalDays(parseInt(e.target.value) || 0)}
-              className="w-full text-center bg-card border border-border rounded-lg px-2 py-1 text-sm font-bold outline-none focus:ring-2 focus:ring-primary"
-            />
-          ) : (
-            <p className="text-xs font-bold">{stats.totalDays}</p>
-          )}
-          <p className="text-[10px] text-muted-foreground">收听天数</p>
-        </div>
-      </div>
-
-      {/* Edit stats button */}
-      <div className="mt-2 flex justify-center">
-        {editingStats ? (
-          <button
-            onClick={handleSaveStats}
-            className="flex items-center gap-1 text-xs text-primary font-semibold hover:underline"
-          >
-            <Check size={12} />
-            保存修改
-          </button>
-        ) : (
-          <button
-            onClick={handleStartEditStats}
-            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
-          >
-            <Pencil size={12} />
-            手动修改统计
-          </button>
-        )}
-      </div>
     </div>
   );
 };
