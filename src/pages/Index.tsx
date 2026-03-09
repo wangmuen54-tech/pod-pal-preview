@@ -99,6 +99,11 @@ const Index = () => {
         </div>
       </div>
 
+      {/* Listen Calendar */}
+      <div className="px-6 mb-6">
+        <ListenCalendar />
+      </div>
+
       {recent.length > 0 && (
         <div className="px-6">
           <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-3">
