@@ -77,10 +77,15 @@ const ReviewCard = ({ item, onReviewed }: { item: ReviewItem & { entry?: Podcast
 const Review = () => {
   const [dueItems, setDueItems] = useState<(ReviewItem & { entry?: PodcastEntry })[]>([]);
   const [upcomingItems, setUpcomingItems] = useState<(ReviewItem & { entry?: PodcastEntry })[]>([]);
+  const [tomorrowCount, setTomorrowCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
   const loadData = async () => {
-    const [due, upcoming] = await Promise.all([getDueReviews(), getUpcomingReviews()]);
+    const [due, upcoming, tmrCount] = await Promise.all([
+      getDueReviews(),
+      getUpcomingReviews(),
+      getTomorrowDueCount(),
+    ]);
     
     // Fetch entries for all items
     const allItems = [...due, ...upcoming];
@@ -90,6 +95,7 @@ const Review = () => {
 
     setDueItems(due.map((i) => ({ ...i, entry: entryMap.get(i.entryId) })));
     setUpcomingItems(upcoming.map((i) => ({ ...i, entry: entryMap.get(i.entryId) })));
+    setTomorrowCount(tmrCount);
     setLoading(false);
   };
 
