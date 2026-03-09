@@ -152,3 +152,21 @@ export async function getUpcomingReviews(): Promise<ReviewItem[]> {
   }
   return (data || []).map(dbToReviewItem);
 }
+
+/** Get count of reviews due by end of tomorrow */
+export async function getTomorrowDueCount(): Promise<number> {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  tomorrow.setHours(23, 59, 59, 999);
+
+  const { count, error } = await supabase
+    .from("review_items")
+    .select("*", { count: "exact", head: true })
+    .lte("next_review_at", tomorrow.toISOString());
+
+  if (error) {
+    console.error("Failed to fetch tomorrow due count:", error);
+    return 0;
+  }
+  return count || 0;
+}
