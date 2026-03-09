@@ -9,7 +9,6 @@ import { fetchEntry, saveEntryToDb, type PodcastEntry } from "@/lib/store";
 import { upsertReviewItem } from "@/lib/review";
 import { supabase } from "@/integrations/supabase/client";
 import StarRating from "@/components/StarRating";
-import FormatToolbar from "@/components/FormatToolbar";
 import { toast } from "sonner";
 
 const SectionCard = ({
@@ -200,12 +199,42 @@ const AINotesSection = ({
           <div>
             <p className="text-xs font-bold text-muted-foreground mb-1">要点</p>
             <ul className="space-y-1.5">
-              {entry.notes!.keyPoints.map((p, i) => (
-                <li key={i} className="flex gap-2 items-start text-sm">
-                  <span className="text-xs font-bold text-primary-foreground bg-primary rounded-full w-5 h-5 flex items-center justify-center shrink-0 mt-0.5">{i + 1}</span>
-                  <span className="leading-relaxed">{p}</span>
-                </li>
-              ))}
+              {entry.notes!.keyPoints.map((p, i) => {
+                const numbered = p.match(/^(\d+)[\.\、]\s*(.*)/);
+                const dashed = p.match(/^[-]\s+(.*)/);
+                const dotted = p.match(/^[·•]\s*(.*)/);
+
+                if (numbered) {
+                  return (
+                    <li key={i} className="flex gap-2 items-start text-sm">
+                      <span className="text-xs font-bold text-primary-foreground bg-primary rounded-full w-5 h-5 flex items-center justify-center shrink-0 mt-0.5">{numbered[1]}</span>
+                      <span className="leading-relaxed">{numbered[2]}</span>
+                    </li>
+                  );
+                }
+                if (dashed) {
+                  return (
+                    <li key={i} className="flex gap-2 items-start text-sm">
+                      <span className="text-primary font-bold shrink-0 mt-0.5">—</span>
+                      <span className="leading-relaxed">{dashed[1]}</span>
+                    </li>
+                  );
+                }
+                if (dotted) {
+                  return (
+                    <li key={i} className="flex gap-2 items-start text-sm">
+                      <span className="text-primary font-bold shrink-0 mt-0.5">·</span>
+                      <span className="leading-relaxed">{dotted[1]}</span>
+                    </li>
+                  );
+                }
+                return (
+                  <li key={i} className="flex gap-2 items-start text-sm">
+                    <span className="text-xs font-bold text-primary-foreground bg-primary rounded-full w-5 h-5 flex items-center justify-center shrink-0 mt-0.5">{i + 1}</span>
+                    <span className="leading-relaxed">{p}</span>
+                  </li>
+                );
+              })}
             </ul>
           </div>
           <div>
@@ -252,8 +281,7 @@ const AINotesSection = ({
             <input value={topic} onChange={(e) => setTopic(e.target.value)} className="w-full bg-surface border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary transition-all" />
           </div>
           <div>
-            <label className="text-xs font-bold text-muted-foreground mb-1.5 block">要点（每行一条）</label>
-            <FormatToolbar value={keyPoints} onChange={setKeyPoints} />
+            <label className="text-xs font-bold text-muted-foreground mb-1.5 block">要点（每行一条，可用 - 或 · 或 1. 开头）</label>
             <textarea value={keyPoints} onChange={(e) => setKeyPoints(e.target.value)} rows={4} className="w-full bg-surface border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary transition-all resize-none" />
           </div>
           <div>

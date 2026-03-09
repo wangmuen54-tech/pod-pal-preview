@@ -4,7 +4,6 @@ import { ArrowLeft, Save, Copy, Share2 } from "lucide-react";
 import { fetchEntry, saveEntryToDb, CATEGORIES, type PodcastCategory } from "@/lib/store";
 import { upsertReviewItem } from "@/lib/review";
 import StarRating from "@/components/StarRating";
-import FormatToolbar from "@/components/FormatToolbar";
 import { toast } from "sonner";
 import type { PodcastEntry } from "@/lib/store";
 
@@ -168,9 +167,8 @@ const Notes = () => {
         </div>
 
         <div>
-          <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 block">要点（每行一条）</label>
-          <FormatToolbar value={keyPoints} onChange={setKeyPoints} />
-          <textarea value={keyPoints} onChange={(e) => setKeyPoints(e.target.value)} rows={5} placeholder={"AI改变职业结构\nAGI仍需10年\n教育将被重塑"} className="w-full bg-card border border-border rounded-2xl px-4 py-3.5 text-sm outline-none focus:ring-2 focus:ring-primary transition-all resize-none placeholder:text-muted-foreground shadow-sm" />
+          <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 block">要点（每行一条，可用 - 或 · 或 1. 开头）</label>
+          <textarea value={keyPoints} onChange={(e) => setKeyPoints(e.target.value)} rows={5} placeholder={"- AI改变职业结构\n· AGI仍需10年\n1. 教育将被重塑"} className="w-full bg-card border border-border rounded-2xl px-4 py-3.5 text-sm outline-none focus:ring-2 focus:ring-primary transition-all resize-none placeholder:text-muted-foreground shadow-sm" />
         </div>
 
         <div>
