@@ -251,8 +251,7 @@ const AINotesSection = ({
             <input value={topic} onChange={(e) => setTopic(e.target.value)} className="w-full bg-surface border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary transition-all" />
           </div>
           <div>
-            <label className="text-xs font-bold text-muted-foreground mb-1.5 block">要点（每行一条）</label>
-            <FormatToolbar value={keyPoints} onChange={setKeyPoints} />
+            <label className="text-xs font-bold text-muted-foreground mb-1.5 block">要点（每行一条，可用 - 或 · 或 1. 开头）</label>
             <textarea value={keyPoints} onChange={(e) => setKeyPoints(e.target.value)} rows={4} className="w-full bg-surface border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary transition-all resize-none" />
           </div>
           <div>
