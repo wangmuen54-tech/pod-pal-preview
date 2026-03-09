@@ -9,6 +9,7 @@ import { fetchEntry, saveEntryToDb, type PodcastEntry } from "@/lib/store";
 import { upsertReviewItem } from "@/lib/review";
 import { supabase } from "@/integrations/supabase/client";
 import StarRating from "@/components/StarRating";
+import FormatToolbar from "@/components/FormatToolbar";
 import { toast } from "sonner";
 
 const SectionCard = ({
@@ -252,6 +253,7 @@ const AINotesSection = ({
           </div>
           <div>
             <label className="text-xs font-bold text-muted-foreground mb-1.5 block">要点（每行一条）</label>
+            <FormatToolbar value={keyPoints} onChange={setKeyPoints} />
             <textarea value={keyPoints} onChange={(e) => setKeyPoints(e.target.value)} rows={4} className="w-full bg-surface border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary transition-all resize-none" />
           </div>
           <div>
