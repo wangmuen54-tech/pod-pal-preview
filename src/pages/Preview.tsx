@@ -9,6 +9,7 @@ import { fetchEntry, saveEntryToDb, type PodcastEntry } from "@/lib/store";
 import { upsertReviewItem } from "@/lib/review";
 import { supabase } from "@/integrations/supabase/client";
 import StarRating from "@/components/StarRating";
+import FormatToolbar from "@/components/FormatToolbar";
 import { toast } from "sonner";
 
 const SectionCard = ({
