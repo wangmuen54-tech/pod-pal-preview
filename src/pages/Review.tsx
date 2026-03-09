@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Brain, ChevronRight, Check, Calendar, Flame } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import { fetchEntry } from "@/lib/store";
-import { getDueReviews, getUpcomingReviews, markReviewed, type ReviewItem } from "@/lib/review";
+import { getDueReviews, getUpcomingReviews, getTomorrowDueCount, markReviewed, type ReviewItem } from "@/lib/review";
 import type { PodcastEntry } from "@/lib/store";
 
 const weightColor = (w: number) => {
