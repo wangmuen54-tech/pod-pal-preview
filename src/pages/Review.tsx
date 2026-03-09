@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Brain, ChevronRight, Check, Calendar, Flame } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import { fetchEntry } from "@/lib/store";
-import { getDueReviews, getUpcomingReviews, markReviewed, type ReviewItem } from "@/lib/review";
+import { getDueReviews, getUpcomingReviews, getTomorrowDueCount, markReviewed, type ReviewItem } from "@/lib/review";
 import type { PodcastEntry } from "@/lib/store";
 
 const weightColor = (w: number) => {
@@ -77,10 +77,15 @@ const ReviewCard = ({ item, onReviewed }: { item: ReviewItem & { entry?: Podcast
 const Review = () => {
   const [dueItems, setDueItems] = useState<(ReviewItem & { entry?: PodcastEntry })[]>([]);
   const [upcomingItems, setUpcomingItems] = useState<(ReviewItem & { entry?: PodcastEntry })[]>([]);
+  const [tomorrowCount, setTomorrowCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
   const loadData = async () => {
-    const [due, upcoming] = await Promise.all([getDueReviews(), getUpcomingReviews()]);
+    const [due, upcoming, tmrCount] = await Promise.all([
+      getDueReviews(),
+      getUpcomingReviews(),
+      getTomorrowDueCount(),
+    ]);
     
     // Fetch entries for all items
     const allItems = [...due, ...upcoming];
@@ -90,6 +95,7 @@ const Review = () => {
 
     setDueItems(due.map((i) => ({ ...i, entry: entryMap.get(i.entryId) })));
     setUpcomingItems(upcoming.map((i) => ({ ...i, entry: entryMap.get(i.entryId) })));
+    setTomorrowCount(tmrCount);
     setLoading(false);
   };
 
@@ -142,6 +148,12 @@ const Review = () => {
             </div>
             <p className="text-sm font-semibold text-foreground">今天的复习都完成啦！</p>
             <p className="text-xs text-muted-foreground mt-1">保持学习节奏 📚</p>
+            {tomorrowCount > 0 && (
+              <div className="mt-4 inline-flex items-center gap-1.5 bg-accent/10 text-accent-foreground px-4 py-2 rounded-xl">
+                <Calendar size={14} className="text-primary" />
+                <span className="text-xs font-semibold">明天有 {tomorrowCount} 篇待复习</span>
+              </div>
+            )}
           </div>
         )}
 
