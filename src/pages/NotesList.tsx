@@ -102,6 +102,23 @@ const NotesList = () => {
         <p className="text-muted-foreground text-xs mt-1">{entries.length} 篇笔记</p>
       </div>
 
+      <div className="px-6 mb-3">
+        <div className="relative">
+          <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <input
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="搜索标题、节目、主题、要点..."
+            className="w-full bg-card border border-border rounded-2xl pl-10 pr-9 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary transition-all placeholder:text-muted-foreground"
+          />
+          {searchQuery && (
+            <button onClick={() => setSearchQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+              <X size={16} />
+            </button>
+          )}
+        </div>
+      </div>
+
 
       <div className="px-6 mb-3">
         <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
