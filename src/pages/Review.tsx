@@ -27,8 +27,8 @@ const ReviewCard = ({ item, onReviewed }: { item: ReviewItem & { entry?: Podcast
       <div className="flex items-start justify-between mb-2">
         <div className="min-w-0 flex-1">
           <p className="font-semibold text-sm truncate">{entry.title}</p>
-          {entry.notes?.topic && (
-            <p className="text-xs text-muted-foreground mt-0.5">📌 {entry.notes.topic}</p>
+          {(entry.notes?.keyIdeas?.[0] || entry.notes?.keyPoints?.[0]) && (
+            <p className="text-xs text-muted-foreground mt-0.5">💡 {entry.notes.keyIdeas?.[0] || entry.notes.keyPoints?.[0]}</p>
           )}
         </div>
         <span className={`text-xs font-bold px-2 py-0.5 rounded-full shrink-0 ml-2 ${weightColor(item.weight)}`}>
