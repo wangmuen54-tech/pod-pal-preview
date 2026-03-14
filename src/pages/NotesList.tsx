@@ -76,8 +76,14 @@ const NotesList = () => {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    const entry = entries.find((e) => e.id === id);
+  const handleDeleteRequest = (id: string) => {
+    setDeleteTarget(id);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return;
+    const entry = entries.find((e) => e.id === deleteTarget);
+    setDeleteTarget(null);
     if (!entry) return;
     const updated = { ...entry, notes: undefined };
     try {
