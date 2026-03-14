@@ -154,9 +154,10 @@ const AINotesSection = ({
     try {
       await saveEntryToDb(updated);
       onNotesUpdated(updated);
-      setTopic("");
-      setKeyPoints("");
-      setThoughts("");
+      setKeyIdeas("");
+      setHighlights("");
+      setMyThoughts("");
+      setAction("");
       setRating(0);
       setEditing(false);
       toast.success("笔记已删除");
