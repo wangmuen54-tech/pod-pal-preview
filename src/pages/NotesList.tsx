@@ -27,6 +27,8 @@ const NotesList = () => {
   const [entries, setEntries] = useState<PodcastEntry[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<PodcastCategory | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
   const loadEntries = async () => {
     const all = await fetchEntries();
