@@ -197,55 +197,46 @@ const AINotesSection = ({
 
       {hasNotes && !editing && !generating && (
         <div className="bg-card border border-border rounded-2xl p-4 shadow-sm space-y-3">
-          <div>
-            <p className="text-xs font-bold text-muted-foreground mb-1">主题</p>
-            <p className="text-sm leading-relaxed">{entry.notes!.topic}</p>
-          </div>
-          <div>
-            <p className="text-xs font-bold text-muted-foreground mb-1">要点</p>
-            <ul className="space-y-1.5">
-              {entry.notes!.keyPoints.map((p, i) => {
-                const numbered = p.match(/^(\d+)[\.\、]\s*(.*)/);
-                const dashed = p.match(/^[-]\s+(.*)/);
-                const dotted = p.match(/^[·•]\s*(.*)/);
-
-                if (numbered) {
-                  return (
+          {/* Key Ideas */}
+          {(() => {
+            const ideas = entry.notes!.keyIdeas || [];
+            return ideas.length > 0 ? (
+              <div>
+                <p className="text-xs font-bold text-muted-foreground mb-1">💡 核心观点</p>
+                <ul className="space-y-1.5">
+                  {ideas.map((p: string, i: number) => (
                     <li key={i} className="flex gap-2 items-start text-sm">
-                      <span className="text-xs font-bold text-primary-foreground bg-primary rounded-full w-5 h-5 flex items-center justify-center shrink-0 mt-0.5">{numbered[1]}</span>
-                      <span className="leading-relaxed">{numbered[2]}</span>
+                      <span className="text-xs font-bold text-primary-foreground bg-primary rounded-full w-5 h-5 flex items-center justify-center shrink-0 mt-0.5">{i + 1}</span>
+                      <span className="leading-relaxed">{p}</span>
                     </li>
-                  );
-                }
-                if (dashed) {
-                  return (
-                    <li key={i} className="flex gap-2 items-start text-sm">
-                      <span className="text-primary font-bold shrink-0 mt-0.5">—</span>
-                      <span className="leading-relaxed">{dashed[1]}</span>
-                    </li>
-                  );
-                }
-                if (dotted) {
-                  return (
-                    <li key={i} className="flex gap-2 items-start text-sm">
-                      <span className="text-primary font-bold shrink-0 mt-0.5">·</span>
-                      <span className="leading-relaxed">{dotted[1]}</span>
-                    </li>
-                  );
-                }
-                return (
-                  <li key={i} className="flex gap-2 items-start text-sm">
-                    <span className="text-xs font-bold text-primary-foreground bg-primary rounded-full w-5 h-5 flex items-center justify-center shrink-0 mt-0.5">{i + 1}</span>
-                    <span className="leading-relaxed">{p}</span>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
+                  ))}
+                </ul>
+              </div>
+            ) : null;
+          })()}
+          {/* Highlights */}
+          {entry.notes!.highlights && entry.notes!.highlights.length > 0 && (
+            <div>
+              <p className="text-xs font-bold text-muted-foreground mb-1">✨ 高光语句</p>
+              <div className="border-l-2 border-primary/40 pl-3 space-y-1">
+                {entry.notes!.highlights.map((h: string, i: number) => (
+                  <p key={i} className="text-sm italic text-muted-foreground leading-relaxed">「{h}」</p>
+                ))}
+              </div>
+            </div>
+          )}
+          {/* Thoughts */}
           <div>
-            <p className="text-xs font-bold text-muted-foreground mb-1">想法</p>
-            <p className="text-sm leading-relaxed">{entry.notes!.thoughts}</p>
+            <p className="text-xs font-bold text-muted-foreground mb-1">💭 我的思考</p>
+            <p className="text-sm leading-relaxed">{entry.notes!.myThoughts || entry.notes!.thoughts}</p>
           </div>
+          {/* Action */}
+          {entry.notes!.action && (
+            <div>
+              <p className="text-xs font-bold text-muted-foreground mb-1">🎯 行动计划</p>
+              <p className="text-sm leading-relaxed">{entry.notes!.action}</p>
+            </div>
+          )}
           <div>
             <p className="text-xs font-bold text-muted-foreground mb-1">评分</p>
             <StarRating rating={entry.notes!.rating} onChange={() => {}} />
