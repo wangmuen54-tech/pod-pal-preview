@@ -108,9 +108,10 @@ const AINotesSection = ({
       if (!data?.success) throw new Error(data?.error || "生成失败");
 
       const notes = {
-        topic: data.data.topic,
-        keyPoints: data.data.keyPoints,
-        thoughts: data.data.thoughts,
+        keyIdeas: data.data.keyIdeas || data.data.keyPoints || [],
+        highlights: data.data.highlights || [],
+        myThoughts: data.data.myThoughts || data.data.thoughts || "",
+        action: data.data.action || "",
         rating: data.data.rating,
       };
 
