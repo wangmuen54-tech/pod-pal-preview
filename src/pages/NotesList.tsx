@@ -167,11 +167,24 @@ const NotesList = () => {
           <div className="space-y-3">
             <p className="text-xs text-muted-foreground/60 text-center">← 左滑删除 · 右滑置顶 →</p>
             {filtered.map((entry) => (
-              <SwipeableNoteCard key={entry.id} entry={entry} showShowName onPin={handlePin} onDelete={handleDelete} />
+              <SwipeableNoteCard key={entry.id} entry={entry} showShowName onPin={handlePin} onDelete={handleDeleteRequest} />
             ))}
           </div>
         )}
       </div>
+
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>确认删除</AlertDialogTitle>
+            <AlertDialogDescription>确定要删除这篇笔记吗？此操作不可撤销。</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">删除</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <BottomNav />
     </div>
