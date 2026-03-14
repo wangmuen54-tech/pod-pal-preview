@@ -69,9 +69,10 @@ const AINotesSection = ({
 }) => {
   const [generating, setGenerating] = useState(false);
   const [editing, setEditing] = useState(false);
-  const [topic, setTopic] = useState(entry.notes?.topic || "");
-  const [keyPoints, setKeyPoints] = useState(entry.notes?.keyPoints.join("\n") || "");
-  const [thoughts, setThoughts] = useState(entry.notes?.thoughts || "");
+  const [keyIdeas, setKeyIdeas] = useState((entry.notes?.keyIdeas || entry.notes?.keyPoints || []).join("\n"));
+  const [highlights, setHighlights] = useState((entry.notes?.highlights || []).join("\n"));
+  const [myThoughts, setMyThoughts] = useState(entry.notes?.myThoughts || entry.notes?.thoughts || "");
+  const [action, setAction] = useState(entry.notes?.action || "");
   const [rating, setRating] = useState(entry.notes?.rating || 0);
   const navigate = useNavigate();
 
@@ -79,9 +80,10 @@ const AINotesSection = ({
 
   const syncState = (notes: PodcastEntry["notes"]) => {
     if (notes) {
-      setTopic(notes.topic);
-      setKeyPoints(notes.keyPoints.join("\n"));
-      setThoughts(notes.thoughts);
+      setKeyIdeas((notes.keyIdeas || []).join("\n"));
+      setHighlights((notes.highlights || []).join("\n"));
+      setMyThoughts(notes.myThoughts || "");
+      setAction(notes.action || "");
       setRating(notes.rating);
     }
   };
