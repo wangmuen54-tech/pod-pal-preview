@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { PenLine, CalendarIcon } from "lucide-react";
+import { PenLine, CalendarIcon, Search, X } from "lucide-react";
 import { format } from "date-fns";
 import BottomNav from "@/components/BottomNav";
 import SwipeableNoteCard from "@/components/SwipeableNoteCard";
@@ -11,12 +11,24 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const NotesList = () => {
   const navigate = useNavigate();
   const [entries, setEntries] = useState<PodcastEntry[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<PodcastCategory | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
   const loadEntries = async () => {
     const all = await fetchEntries();
@@ -34,12 +46,22 @@ const NotesList = () => {
       const dateStr = format(selectedDate, "yyyy-MM-dd");
       list = list.filter((e) => e.createdAt.startsWith(dateStr));
     }
+    if (searchQuery.trim()) {
+      const q = searchQuery.trim().toLowerCase();
+      list = list.filter((e) =>
+        e.title.toLowerCase().includes(q) ||
+        e.showName?.toLowerCase().includes(q) ||
+        e.notes?.topic?.toLowerCase().includes(q) ||
+        e.notes?.thoughts?.toLowerCase().includes(q) ||
+        e.notes?.keyPoints?.some((p: string) => p.toLowerCase().includes(q))
+      );
+    }
     return list.sort((a, b) => {
       if (a.pinned && !b.pinned) return -1;
       if (!a.pinned && b.pinned) return 1;
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
-  }, [entries, selectedCategory, selectedDate]);
+  }, [entries, selectedCategory, selectedDate, searchQuery]);
 
   const handlePin = async (id: string) => {
     const entry = entries.find((e) => e.id === id);
@@ -54,8 +76,14 @@ const NotesList = () => {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    const entry = entries.find((e) => e.id === id);
+  const handleDeleteRequest = (id: string) => {
+    setDeleteTarget(id);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return;
+    const entry = entries.find((e) => e.id === deleteTarget);
+    setDeleteTarget(null);
     if (!entry) return;
     const updated = { ...entry, notes: undefined };
     try {
@@ -72,6 +100,23 @@ const NotesList = () => {
       <div className="px-6 pt-12 pb-4">
         <h1 className="text-2xl font-display font-extrabold">我的笔记</h1>
         <p className="text-muted-foreground text-xs mt-1">{entries.length} 篇笔记</p>
+      </div>
+
+      <div className="px-6 mb-3">
+        <div className="relative">
+          <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <input
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="搜索标题、节目、主题、要点..."
+            className="w-full bg-card border border-border rounded-2xl pl-10 pr-9 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary transition-all placeholder:text-muted-foreground"
+          />
+          {searchQuery && (
+            <button onClick={() => setSearchQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+              <X size={16} />
+            </button>
+          )}
+        </div>
       </div>
 
 
@@ -122,11 +167,24 @@ const NotesList = () => {
           <div className="space-y-3">
             <p className="text-xs text-muted-foreground/60 text-center">← 左滑删除 · 右滑置顶 →</p>
             {filtered.map((entry) => (
-              <SwipeableNoteCard key={entry.id} entry={entry} showShowName onPin={handlePin} onDelete={handleDelete} />
+              <SwipeableNoteCard key={entry.id} entry={entry} showShowName onPin={handlePin} onDelete={handleDeleteRequest} />
             ))}
           </div>
         )}
       </div>
+
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>确认删除</AlertDialogTitle>
+            <AlertDialogDescription>确定要删除这篇笔记吗？此操作不可撤销。</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">删除</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <BottomNav />
     </div>
