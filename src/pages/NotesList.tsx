@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { PenLine, CalendarIcon } from "lucide-react";
+import { PenLine, CalendarIcon, Search, X } from "lucide-react";
 import { format } from "date-fns";
 import BottomNav from "@/components/BottomNav";
 import SwipeableNoteCard from "@/components/SwipeableNoteCard";
@@ -11,6 +11,16 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const NotesList = () => {
   const navigate = useNavigate();
