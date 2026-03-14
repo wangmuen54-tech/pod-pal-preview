@@ -27,8 +27,8 @@ const ReviewCard = ({ item, onReviewed }: { item: ReviewItem & { entry?: Podcast
       <div className="flex items-start justify-between mb-2">
         <div className="min-w-0 flex-1">
           <p className="font-semibold text-sm truncate">{entry.title}</p>
-          {entry.notes?.topic && (
-            <p className="text-xs text-muted-foreground mt-0.5">📌 {entry.notes.topic}</p>
+          {(entry.notes?.keyIdeas?.[0] || entry.notes?.keyPoints?.[0]) && (
+            <p className="text-xs text-muted-foreground mt-0.5">💡 {entry.notes.keyIdeas?.[0] || entry.notes.keyPoints?.[0]}</p>
           )}
         </div>
         <span className={`text-xs font-bold px-2 py-0.5 rounded-full shrink-0 ml-2 ${weightColor(item.weight)}`}>
@@ -37,24 +37,27 @@ const ReviewCard = ({ item, onReviewed }: { item: ReviewItem & { entry?: Podcast
         </span>
       </div>
 
-      {entry.notes?.keyPoints && entry.notes.keyPoints.length > 0 && (
-        <div className="mb-3">
-          <p className="text-xs font-bold text-muted-foreground mb-1">要点回顾</p>
-          <ul className="space-y-1">
-            {entry.notes.keyPoints.slice(0, 3).map((p, i) => (
-              <li key={i} className="text-xs text-muted-foreground flex gap-1.5">
-                <span className="text-primary shrink-0">•</span>
-                {p}
-              </li>
-            ))}
-            {entry.notes.keyPoints.length > 3 && (
-              <li className="text-xs text-muted-foreground/60">
-                还有 {entry.notes.keyPoints.length - 3} 条...
-              </li>
-            )}
-          </ul>
-        </div>
-      )}
+      {(() => {
+        const ideas = entry.notes?.keyIdeas || entry.notes?.keyPoints || [];
+        return ideas.length > 0 ? (
+          <div className="mb-3">
+            <p className="text-xs font-bold text-muted-foreground mb-1">核心观点</p>
+            <ul className="space-y-1">
+              {ideas.slice(0, 3).map((p: string, i: number) => (
+                <li key={i} className="text-xs text-muted-foreground flex gap-1.5">
+                  <span className="text-primary shrink-0">•</span>
+                  {p}
+                </li>
+              ))}
+              {ideas.length > 3 && (
+                <li className="text-xs text-muted-foreground/60">
+                  还有 {ideas.length - 3} 条...
+                </li>
+              )}
+            </ul>
+          </div>
+        ) : null;
+      })()}
 
       <div className="flex gap-2">
         <button

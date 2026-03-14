@@ -29,10 +29,12 @@ export function calculateWeight(entry: PodcastEntry): number {
   if (!entry.notes) return 0;
   let score = 0;
   score += (entry.notes.rating || 0) * 8;
-  const pointCount = entry.notes.keyPoints?.length || 0;
-  score += Math.min(pointCount * 8, 30);
-  if (entry.notes.topic?.trim()) score += 10;
-  if (entry.notes.thoughts?.trim()) score += 20;
+  const ideasCount = (entry.notes.keyIdeas || entry.notes.keyPoints || []).length;
+  score += Math.min(ideasCount * 8, 30);
+  if ((entry.notes.myThoughts || entry.notes.thoughts || "").trim()) score += 20;
+  if (entry.notes.action?.trim()) score += 10;
+  const hlCount = (entry.notes.highlights || []).length;
+  score += Math.min(hlCount * 5, 10);
   return Math.min(score, 100);
 }
 

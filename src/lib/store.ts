@@ -30,10 +30,15 @@ export interface PodcastEntry {
   relatedResources?: { name: string; description: string }[];
   createdAt: string;
   notes?: {
-    topic: string;
-    keyPoints: string[];
-    thoughts: string;
+    keyIdeas: string[];
+    highlights: string[];
+    myThoughts: string;
+    action: string;
     rating: number;
+    /** @deprecated migrated fields */
+    topic?: string;
+    keyPoints?: string[];
+    thoughts?: string;
   };
 }
 

@@ -69,9 +69,10 @@ const AINotesSection = ({
 }) => {
   const [generating, setGenerating] = useState(false);
   const [editing, setEditing] = useState(false);
-  const [topic, setTopic] = useState(entry.notes?.topic || "");
-  const [keyPoints, setKeyPoints] = useState(entry.notes?.keyPoints.join("\n") || "");
-  const [thoughts, setThoughts] = useState(entry.notes?.thoughts || "");
+  const [keyIdeas, setKeyIdeas] = useState((entry.notes?.keyIdeas || entry.notes?.keyPoints || []).join("\n"));
+  const [highlights, setHighlights] = useState((entry.notes?.highlights || []).join("\n"));
+  const [myThoughts, setMyThoughts] = useState(entry.notes?.myThoughts || entry.notes?.thoughts || "");
+  const [action, setAction] = useState(entry.notes?.action || "");
   const [rating, setRating] = useState(entry.notes?.rating || 0);
   const navigate = useNavigate();
 
@@ -79,9 +80,10 @@ const AINotesSection = ({
 
   const syncState = (notes: PodcastEntry["notes"]) => {
     if (notes) {
-      setTopic(notes.topic);
-      setKeyPoints(notes.keyPoints.join("\n"));
-      setThoughts(notes.thoughts);
+      setKeyIdeas((notes.keyIdeas || []).join("\n"));
+      setHighlights((notes.highlights || []).join("\n"));
+      setMyThoughts(notes.myThoughts || "");
+      setAction(notes.action || "");
       setRating(notes.rating);
     }
   };
@@ -106,9 +108,10 @@ const AINotesSection = ({
       if (!data?.success) throw new Error(data?.error || "生成失败");
 
       const notes = {
-        topic: data.data.topic,
-        keyPoints: data.data.keyPoints,
-        thoughts: data.data.thoughts,
+        keyIdeas: data.data.keyIdeas || data.data.keyPoints || [],
+        highlights: data.data.highlights || [],
+        myThoughts: data.data.myThoughts || data.data.thoughts || "",
+        action: data.data.action || "",
         rating: data.data.rating,
       };
 
@@ -128,9 +131,10 @@ const AINotesSection = ({
 
   const handleSave = async () => {
     const notes = {
-      topic,
-      keyPoints: keyPoints.split("\n").filter((p) => p.trim()),
-      thoughts,
+      keyIdeas: keyIdeas.split("\n").filter((p) => p.trim()),
+      highlights: highlights.split("\n").filter((p) => p.trim()),
+      myThoughts,
+      action,
       rating,
     };
     const updated = { ...entry, notes };
@@ -150,9 +154,10 @@ const AINotesSection = ({
     try {
       await saveEntryToDb(updated);
       onNotesUpdated(updated);
-      setTopic("");
-      setKeyPoints("");
-      setThoughts("");
+      setKeyIdeas("");
+      setHighlights("");
+      setMyThoughts("");
+      setAction("");
       setRating(0);
       setEditing(false);
       toast.success("笔记已删除");
@@ -192,55 +197,46 @@ const AINotesSection = ({
 
       {hasNotes && !editing && !generating && (
         <div className="bg-card border border-border rounded-2xl p-4 shadow-sm space-y-3">
-          <div>
-            <p className="text-xs font-bold text-muted-foreground mb-1">主题</p>
-            <p className="text-sm leading-relaxed">{entry.notes!.topic}</p>
-          </div>
-          <div>
-            <p className="text-xs font-bold text-muted-foreground mb-1">要点</p>
-            <ul className="space-y-1.5">
-              {entry.notes!.keyPoints.map((p, i) => {
-                const numbered = p.match(/^(\d+)[\.\、]\s*(.*)/);
-                const dashed = p.match(/^[-]\s+(.*)/);
-                const dotted = p.match(/^[·•]\s*(.*)/);
-
-                if (numbered) {
-                  return (
+          {/* Key Ideas */}
+          {(() => {
+            const ideas = entry.notes!.keyIdeas || [];
+            return ideas.length > 0 ? (
+              <div>
+                <p className="text-xs font-bold text-muted-foreground mb-1">💡 核心观点</p>
+                <ul className="space-y-1.5">
+                  {ideas.map((p: string, i: number) => (
                     <li key={i} className="flex gap-2 items-start text-sm">
-                      <span className="text-xs font-bold text-primary-foreground bg-primary rounded-full w-5 h-5 flex items-center justify-center shrink-0 mt-0.5">{numbered[1]}</span>
-                      <span className="leading-relaxed">{numbered[2]}</span>
+                      <span className="text-xs font-bold text-primary-foreground bg-primary rounded-full w-5 h-5 flex items-center justify-center shrink-0 mt-0.5">{i + 1}</span>
+                      <span className="leading-relaxed">{p}</span>
                     </li>
-                  );
-                }
-                if (dashed) {
-                  return (
-                    <li key={i} className="flex gap-2 items-start text-sm">
-                      <span className="text-primary font-bold shrink-0 mt-0.5">—</span>
-                      <span className="leading-relaxed">{dashed[1]}</span>
-                    </li>
-                  );
-                }
-                if (dotted) {
-                  return (
-                    <li key={i} className="flex gap-2 items-start text-sm">
-                      <span className="text-primary font-bold shrink-0 mt-0.5">·</span>
-                      <span className="leading-relaxed">{dotted[1]}</span>
-                    </li>
-                  );
-                }
-                return (
-                  <li key={i} className="flex gap-2 items-start text-sm">
-                    <span className="text-xs font-bold text-primary-foreground bg-primary rounded-full w-5 h-5 flex items-center justify-center shrink-0 mt-0.5">{i + 1}</span>
-                    <span className="leading-relaxed">{p}</span>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
+                  ))}
+                </ul>
+              </div>
+            ) : null;
+          })()}
+          {/* Highlights */}
+          {entry.notes!.highlights && entry.notes!.highlights.length > 0 && (
+            <div>
+              <p className="text-xs font-bold text-muted-foreground mb-1">✨ 高光语句</p>
+              <div className="border-l-2 border-primary/40 pl-3 space-y-1">
+                {entry.notes!.highlights.map((h: string, i: number) => (
+                  <p key={i} className="text-sm italic text-muted-foreground leading-relaxed">「{h}」</p>
+                ))}
+              </div>
+            </div>
+          )}
+          {/* Thoughts */}
           <div>
-            <p className="text-xs font-bold text-muted-foreground mb-1">想法</p>
-            <p className="text-sm leading-relaxed">{entry.notes!.thoughts}</p>
+            <p className="text-xs font-bold text-muted-foreground mb-1">💭 我的思考</p>
+            <p className="text-sm leading-relaxed">{entry.notes!.myThoughts || entry.notes!.thoughts}</p>
           </div>
+          {/* Action */}
+          {entry.notes!.action && (
+            <div>
+              <p className="text-xs font-bold text-muted-foreground mb-1">🎯 行动计划</p>
+              <p className="text-sm leading-relaxed">{entry.notes!.action}</p>
+            </div>
+          )}
           <div>
             <p className="text-xs font-bold text-muted-foreground mb-1">评分</p>
             <StarRating rating={entry.notes!.rating} onChange={() => {}} />
@@ -277,16 +273,20 @@ const AINotesSection = ({
       {editing && (
         <div className="bg-card border border-border rounded-2xl p-4 shadow-sm space-y-4">
           <div>
-            <label className="text-xs font-bold text-muted-foreground mb-1.5 block">主题</label>
-            <input value={topic} onChange={(e) => setTopic(e.target.value)} className="w-full bg-surface border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary transition-all" />
+            <label className="text-xs font-bold text-muted-foreground mb-1.5 block">核心观点（每行一条）</label>
+            <textarea value={keyIdeas} onChange={(e) => setKeyIdeas(e.target.value)} rows={4} className="w-full bg-surface border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary transition-all resize-none" />
           </div>
           <div>
-            <label className="text-xs font-bold text-muted-foreground mb-1.5 block">要点（每行一条，可用 - 或 · 或 1. 开头）</label>
-            <textarea value={keyPoints} onChange={(e) => setKeyPoints(e.target.value)} rows={4} className="w-full bg-surface border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary transition-all resize-none" />
+            <label className="text-xs font-bold text-muted-foreground mb-1.5 block">高光语句（每行一条）</label>
+            <textarea value={highlights} onChange={(e) => setHighlights(e.target.value)} rows={3} className="w-full bg-surface border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary transition-all resize-none italic" />
           </div>
           <div>
-            <label className="text-xs font-bold text-muted-foreground mb-1.5 block">想法</label>
-            <textarea value={thoughts} onChange={(e) => setThoughts(e.target.value)} rows={2} className="w-full bg-surface border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary transition-all resize-none" />
+            <label className="text-xs font-bold text-muted-foreground mb-1.5 block">我的思考</label>
+            <textarea value={myThoughts} onChange={(e) => setMyThoughts(e.target.value)} rows={2} className="w-full bg-surface border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary transition-all resize-none" />
+          </div>
+          <div>
+            <label className="text-xs font-bold text-muted-foreground mb-1.5 block">行动计划</label>
+            <textarea value={action} onChange={(e) => setAction(e.target.value)} rows={2} className="w-full bg-surface border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary transition-all resize-none" />
           </div>
           <div>
             <label className="text-xs font-bold text-muted-foreground mb-1.5 block">评分</label>

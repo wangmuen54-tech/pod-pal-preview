@@ -51,6 +51,11 @@ const NotesList = () => {
       list = list.filter((e) =>
         e.title.toLowerCase().includes(q) ||
         e.showName?.toLowerCase().includes(q) ||
+        e.notes?.myThoughts?.toLowerCase().includes(q) ||
+        e.notes?.action?.toLowerCase().includes(q) ||
+        e.notes?.keyIdeas?.some((p: string) => p.toLowerCase().includes(q)) ||
+        e.notes?.highlights?.some((p: string) => p.toLowerCase().includes(q)) ||
+        // Legacy support
         e.notes?.topic?.toLowerCase().includes(q) ||
         e.notes?.thoughts?.toLowerCase().includes(q) ||
         e.notes?.keyPoints?.some((p: string) => p.toLowerCase().includes(q))
