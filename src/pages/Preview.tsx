@@ -131,9 +131,10 @@ const AINotesSection = ({
 
   const handleSave = async () => {
     const notes = {
-      topic,
-      keyPoints: keyPoints.split("\n").filter((p) => p.trim()),
-      thoughts,
+      keyIdeas: keyIdeas.split("\n").filter((p) => p.trim()),
+      highlights: highlights.split("\n").filter((p) => p.trim()),
+      myThoughts,
+      action,
       rating,
     };
     const updated = { ...entry, notes };
