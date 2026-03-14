@@ -273,16 +273,20 @@ const AINotesSection = ({
       {editing && (
         <div className="bg-card border border-border rounded-2xl p-4 shadow-sm space-y-4">
           <div>
-            <label className="text-xs font-bold text-muted-foreground mb-1.5 block">主题</label>
-            <input value={topic} onChange={(e) => setTopic(e.target.value)} className="w-full bg-surface border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary transition-all" />
+            <label className="text-xs font-bold text-muted-foreground mb-1.5 block">核心观点（每行一条）</label>
+            <textarea value={keyIdeas} onChange={(e) => setKeyIdeas(e.target.value)} rows={4} className="w-full bg-surface border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary transition-all resize-none" />
           </div>
           <div>
-            <label className="text-xs font-bold text-muted-foreground mb-1.5 block">要点（每行一条，可用 - 或 · 或 1. 开头）</label>
-            <textarea value={keyPoints} onChange={(e) => setKeyPoints(e.target.value)} rows={4} className="w-full bg-surface border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary transition-all resize-none" />
+            <label className="text-xs font-bold text-muted-foreground mb-1.5 block">高光语句（每行一条）</label>
+            <textarea value={highlights} onChange={(e) => setHighlights(e.target.value)} rows={3} className="w-full bg-surface border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary transition-all resize-none italic" />
           </div>
           <div>
-            <label className="text-xs font-bold text-muted-foreground mb-1.5 block">想法</label>
-            <textarea value={thoughts} onChange={(e) => setThoughts(e.target.value)} rows={2} className="w-full bg-surface border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary transition-all resize-none" />
+            <label className="text-xs font-bold text-muted-foreground mb-1.5 block">我的思考</label>
+            <textarea value={myThoughts} onChange={(e) => setMyThoughts(e.target.value)} rows={2} className="w-full bg-surface border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary transition-all resize-none" />
+          </div>
+          <div>
+            <label className="text-xs font-bold text-muted-foreground mb-1.5 block">行动计划</label>
+            <textarea value={action} onChange={(e) => setAction(e.target.value)} rows={2} className="w-full bg-surface border border-border rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary transition-all resize-none" />
           </div>
           <div>
             <label className="text-xs font-bold text-muted-foreground mb-1.5 block">评分</label>

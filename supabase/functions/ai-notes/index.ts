@@ -42,18 +42,19 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `你是一个播客笔记助手。根据播客的预习材料，帮用户生成精炼的听后笔记。
-笔记应该：
-1. 主题（topic）：用一句话概括这期播客的核心主题
-2. 要点（keyPoints）：提炼3-6个最重要的收获和知识点，每条简洁有力
-3. 想法（thoughts）：站在听众角度写2-3句感想，自然、有洞察力
-4. 评分（rating）：根据内容质量给出1-5分的推荐评分（可以有0.5分）
+            content: `你是一个播客知识笔记助手。根据播客的预习材料，帮用户生成结构化的知识笔记。
+笔记结构：
+1. keyIdeas（核心观点）：提炼3-6个最重要的观点和知识点，每条简洁有力
+2. highlights（高光语句）：提取2-4句播客中特别有启发性的金句或名言
+3. myThoughts（我的思考）：站在听众角度写2-3句感想，自然、有洞察力
+4. action（行动计划）：基于内容建议1-2个具体可执行的行动
+5. rating（评分）：根据内容质量给出1-5分的推荐评分（可以有0.5分）
 
 必须用中文回复。你必须调用 generate_notes 函数来返回结果。`
           },
           {
             role: 'user',
-            content: `请根据以下播客预习材料生成笔记：\n\n${context}`
+            content: `请根据以下播客预习材料生成知识笔记：\n\n${context}`
           },
         ],
         tools: [
@@ -61,20 +62,25 @@ serve(async (req) => {
             type: 'function',
             function: {
               name: 'generate_notes',
-              description: '生成播客听后笔记',
+              description: '生成播客知识笔记',
               parameters: {
                 type: 'object',
                 properties: {
-                  topic: { type: 'string', description: '一句话概括主题' },
-                  keyPoints: {
+                  keyIdeas: {
                     type: 'array',
                     items: { type: 'string' },
-                    description: '3-6个要点',
+                    description: '3-6个核心观点',
                   },
-                  thoughts: { type: 'string', description: '2-3句感想' },
+                  highlights: {
+                    type: 'array',
+                    items: { type: 'string' },
+                    description: '2-4条高光语句/金句',
+                  },
+                  myThoughts: { type: 'string', description: '2-3句思考感想' },
+                  action: { type: 'string', description: '1-2个行动建议' },
                   rating: { type: 'number', description: '1-5分评分' },
                 },
-                required: ['topic', 'keyPoints', 'thoughts', 'rating'],
+                required: ['keyIdeas', 'highlights', 'myThoughts', 'action', 'rating'],
                 additionalProperties: false,
               },
             },
