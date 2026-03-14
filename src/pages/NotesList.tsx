@@ -46,12 +46,22 @@ const NotesList = () => {
       const dateStr = format(selectedDate, "yyyy-MM-dd");
       list = list.filter((e) => e.createdAt.startsWith(dateStr));
     }
+    if (searchQuery.trim()) {
+      const q = searchQuery.trim().toLowerCase();
+      list = list.filter((e) =>
+        e.title.toLowerCase().includes(q) ||
+        e.showName?.toLowerCase().includes(q) ||
+        e.notes?.topic?.toLowerCase().includes(q) ||
+        e.notes?.thoughts?.toLowerCase().includes(q) ||
+        e.notes?.keyPoints?.some((p: string) => p.toLowerCase().includes(q))
+      );
+    }
     return list.sort((a, b) => {
       if (a.pinned && !b.pinned) return -1;
       if (!a.pinned && b.pinned) return 1;
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
-  }, [entries, selectedCategory, selectedDate]);
+  }, [entries, selectedCategory, selectedDate, searchQuery]);
 
   const handlePin = async (id: string) => {
     const entry = entries.find((e) => e.id === id);
