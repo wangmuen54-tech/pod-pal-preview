@@ -37,24 +37,27 @@ const ReviewCard = ({ item, onReviewed }: { item: ReviewItem & { entry?: Podcast
         </span>
       </div>
 
-      {entry.notes?.keyPoints && entry.notes.keyPoints.length > 0 && (
-        <div className="mb-3">
-          <p className="text-xs font-bold text-muted-foreground mb-1">要点回顾</p>
-          <ul className="space-y-1">
-            {entry.notes.keyPoints.slice(0, 3).map((p, i) => (
-              <li key={i} className="text-xs text-muted-foreground flex gap-1.5">
-                <span className="text-primary shrink-0">•</span>
-                {p}
-              </li>
-            ))}
-            {entry.notes.keyPoints.length > 3 && (
-              <li className="text-xs text-muted-foreground/60">
-                还有 {entry.notes.keyPoints.length - 3} 条...
-              </li>
-            )}
-          </ul>
-        </div>
-      )}
+      {(() => {
+        const ideas = entry.notes?.keyIdeas || entry.notes?.keyPoints || [];
+        return ideas.length > 0 ? (
+          <div className="mb-3">
+            <p className="text-xs font-bold text-muted-foreground mb-1">核心观点</p>
+            <ul className="space-y-1">
+              {ideas.slice(0, 3).map((p: string, i: number) => (
+                <li key={i} className="text-xs text-muted-foreground flex gap-1.5">
+                  <span className="text-primary shrink-0">•</span>
+                  {p}
+                </li>
+              ))}
+              {ideas.length > 3 && (
+                <li className="text-xs text-muted-foreground/60">
+                  还有 {ideas.length - 3} 条...
+                </li>
+              )}
+            </ul>
+          </div>
+        ) : null;
+      })()}
 
       <div className="flex gap-2">
         <button
