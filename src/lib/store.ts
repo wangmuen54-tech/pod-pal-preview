@@ -129,30 +129,6 @@ export async function deleteEntryFromDb(id: string): Promise<void> {
   if (error) throw error;
 }
 
-// ---- Legacy localStorage wrappers (kept for backward compat during migration) ----
-
-const STORAGE_KEY = "podprep_entries";
-
-export function getEntries(): PodcastEntry[] {
-  try {
-    const data = localStorage.getItem(STORAGE_KEY);
-    return data ? JSON.parse(data) : [];
-  } catch {
-    return [];
-  }
-}
-
-export function saveEntry(entry: PodcastEntry) {
-  const entries = getEntries();
-  const idx = entries.findIndex((e) => e.id === entry.id);
-  if (idx >= 0) entries[idx] = entry;
-  else entries.unshift(entry);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
-}
-
-export function getEntry(id: string): PodcastEntry | undefined {
-  return getEntries().find((e) => e.id === id);
-}
 
 export async function generatePreview(url: string): Promise<PodcastEntry> {
   const { data, error } = await supabase.functions.invoke("podcast-preview", {
