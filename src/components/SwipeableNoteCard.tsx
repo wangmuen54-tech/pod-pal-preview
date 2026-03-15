@@ -43,11 +43,6 @@ const SwipeableNoteCard = ({ entry, showShowName, onPin, onDelete }: Props) => {
   const pinOpacity = Math.min(1, Math.max(0, offsetX / THRESHOLD));
   const deleteOpacity = Math.min(1, Math.max(0, -offsetX / THRESHOLD));
 
-  // Support both new and legacy fields
-  const notes = entry.notes;
-  const keyIdeas = notes?.keyIdeas || notes?.keyPoints || [];
-  const firstIdea = keyIdeas[0];
-
   return (
     <div className="relative overflow-hidden rounded-2xl animate-fade-in">
       <div className="absolute inset-y-0 left-0 w-20 flex items-center justify-center bg-amber-500 rounded-l-2xl transition-opacity" style={{ opacity: pinOpacity }}>
@@ -82,19 +77,9 @@ const SwipeableNoteCard = ({ entry, showShowName, onPin, onDelete }: Props) => {
                 <span className="text-xs text-accent-foreground bg-accent px-2 py-0.5 rounded-full">{entry.category}</span>
               )}
             </div>
-            {firstIdea && (
-              <p className="text-xs text-muted-foreground truncate mb-1">
-                💡 {firstIdea}
-              </p>
-            )}
-            {notes?.highlights?.[0] && (
-              <p className="text-xs text-muted-foreground/70 italic truncate mb-1">
-                "{notes.highlights[0]}"
-              </p>
-            )}
             <div className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground">{new Date(entry.createdAt).toLocaleDateString("zh-CN")}</span>
-              {notes?.rating ? <StarRating rating={notes.rating} size={14} /> : null}
+              {entry.notes?.rating ? <StarRating rating={entry.notes.rating} size={14} /> : null}
             </div>
           </div>
           <ChevronRight size={16} className="text-muted-foreground shrink-0 ml-2" />
