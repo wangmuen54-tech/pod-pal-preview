@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Sparkles, PenLine, Brain, ChevronRight, LogOut } from "lucide-react";
+import { Sparkles, PenLine, Brain, ChevronRight, LogOut, Headphones, FileText, RotateCcw } from "lucide-react";
 import BottomNav from "@/components/BottomNav";
 import ListenCalendar from "@/components/ListenCalendar";
 import { fetchEntries, type PodcastEntry } from "@/lib/store";
-import { getDueReviews } from "@/lib/review";
+import { getDueReviews, fetchReviewItems } from "@/lib/review";
 import { useAuth } from "@/contexts/AuthContext";
+import { Badge } from "@/components/ui/badge";
 import cuteBear from "@/assets/cute-bear.png";
 
 const Index = () => {
@@ -13,10 +14,15 @@ const Index = () => {
   const { signOut } = useAuth();
   const [entries, setEntries] = useState<PodcastEntry[]>([]);
   const [dueCount, setDueCount] = useState(0);
+  const [reviewedIds, setReviewedIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     fetchEntries().then(setEntries);
     getDueReviews().then((items) => setDueCount(items.length));
+    fetchReviewItems().then((items) => {
+      const ids = new Set(items.filter((r) => r.reviewCount > 0).map((r) => r.entryId));
+      setReviewedIds(ids);
+    });
   }, []);
 
   const notesCount = entries.filter((e) => e.notes).length;
@@ -46,7 +52,7 @@ const Index = () => {
     },
   ];
 
-  const recent = entries.slice(0, 3);
+  const recent = entries.slice(0, 5);
 
   return (
     <div className="min-h-screen bg-background pb-20 relative overflow-hidden">
@@ -74,7 +80,7 @@ const Index = () => {
         </div>
       </div>
 
-      {/* Listen Calendar (stats on top inside component) */}
+      {/* Listen Calendar */}
       <div className="px-6 mb-4">
         <ListenCalendar />
       </div>
@@ -109,25 +115,47 @@ const Index = () => {
             最近记录
           </h2>
           <div className="space-y-2">
-            {recent.map((entry) => (
-              <button
-                key={entry.id}
-                onClick={() =>
-                  entry.notes
-                    ? navigate(`/notes/${entry.id}`)
-                    : navigate(`/preview/${entry.id}`)
-                }
-                className="w-full bg-card border border-border rounded-2xl px-4 py-3.5 flex items-center justify-between text-left transition-all hover:shadow-md hover:border-primary/30 animate-fade-in"
-              >
-                <div className="min-w-0">
-                  <p className="font-semibold text-sm truncate">{entry.title}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    {new Date(entry.createdAt).toLocaleDateString("zh-CN")}
-                  </p>
-                </div>
-                <ChevronRight size={16} className="text-muted-foreground shrink-0" />
-              </button>
-            ))}
+            {recent.map((entry) => {
+              const hasNotes = !!entry.notes;
+              const hasReviewed = reviewedIds.has(entry.id);
+              return (
+                <button
+                  key={entry.id}
+                  onClick={() =>
+                    entry.notes
+                      ? navigate(`/notes/${entry.id}`)
+                      : navigate(`/preview/${entry.id}`)
+                  }
+                  className="w-full bg-card border border-border rounded-2xl px-4 py-3.5 flex items-center gap-3 text-left transition-all hover:shadow-md hover:border-primary/30 animate-fade-in"
+                >
+                  <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                    <Headphones size={16} className="text-primary" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-sm truncate">{entry.title}</p>
+                    <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                      <span className="text-xs text-muted-foreground">
+                        {new Date(entry.createdAt).toLocaleDateString("zh-CN")}
+                      </span>
+                      <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-primary/10 text-primary border-primary/20">
+                        AI预习
+                      </Badge>
+                      {hasNotes && (
+                        <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-accent/20 text-accent-foreground border-accent/30">
+                          已做笔记
+                        </Badge>
+                      )}
+                      {hasReviewed && (
+                        <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-destructive/10 text-destructive border-destructive/20">
+                          已复习
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                  <ChevronRight size={16} className="text-muted-foreground shrink-0" />
+                </button>
+              );
+            })}
           </div>
         </div>
       )}
