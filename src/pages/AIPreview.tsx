@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Sparkles, ChevronRight } from "lucide-react";
+import { Sparkles, ChevronRight, Headphones, FileText, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import BottomNav from "@/components/BottomNav";
@@ -71,6 +71,22 @@ const AIPreview = () => {
               </>
             )}
           </button>
+
+          {/* AI explanation */}
+          <div className="mt-4 pt-3 border-t border-border">
+            <p className="text-xs font-semibold text-muted-foreground mb-2">AI会帮你快速理解这期播客：</p>
+            <ul className="space-y-1">
+              <li className="text-xs text-muted-foreground/80 flex items-start gap-1.5">
+                <span className="shrink-0 mt-0.5">•</span>1分钟了解节目在聊什么
+              </li>
+              <li className="text-xs text-muted-foreground/80 flex items-start gap-1.5">
+                <span className="shrink-0 mt-0.5">•</span>提前解释可能听不懂的概念
+              </li>
+              <li className="text-xs text-muted-foreground/80 flex items-start gap-1.5">
+                <span className="shrink-0 mt-0.5">•</span>补充必要的背景知识
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
 
@@ -86,19 +102,25 @@ const AIPreview = () => {
                 <button
                   key={entry.id}
                   onClick={() => navigate(`/preview/${entry.id}`)}
-                  className="w-full bg-card border border-border rounded-2xl px-4 py-3.5 flex items-center justify-between text-left transition-all hover:shadow-md hover:border-primary/30 animate-fade-in"
+                  className="w-full bg-card border border-border rounded-2xl px-4 py-3.5 flex items-center gap-3 text-left transition-all hover:shadow-md hover:border-primary/30 animate-fade-in"
                 >
+                  <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                    <Headphones size={16} className="text-primary" />
+                  </div>
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <p className="font-semibold text-sm truncate">{entry.title}</p>
-                    </div>
-                    <div className="flex items-center gap-2">
+                    <p className="font-semibold text-sm truncate">{entry.title}</p>
+                    <div className="flex items-center gap-1.5 mt-1 flex-wrap">
                       <span className="text-xs text-muted-foreground">
                         {new Date(entry.createdAt).toLocaleDateString("zh-CN")}
                       </span>
-                      <Badge variant={hasNotes ? "default" : "outline"} className="text-[10px] px-1.5 py-0">
-                        {hasNotes ? "已做笔记" : "未做笔记"}
+                      <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-primary/10 text-primary border-primary/20">
+                        AI预习
                       </Badge>
+                      {hasNotes && (
+                        <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-accent/20 text-accent-foreground border-accent/30">
+                          已做笔记
+                        </Badge>
+                      )}
                     </div>
                   </div>
                   <ChevronRight size={16} className="text-muted-foreground shrink-0" />

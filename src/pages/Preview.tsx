@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft, Headphones, ChevronDown, ChevronUp, ExternalLink,
-  User, Lightbulb, Calendar, MessageCircle, BookOpen, HelpCircle, Info,
-  Copy, Sparkles, Trash2, Pencil,
+  User, Lightbulb, Calendar, MessageCircle, BookOpen, HelpCircle,
+  Copy, Sparkles, Trash2, Pencil, Target, Eye,
 } from "lucide-react";
 import { fetchEntry, saveEntryToDb, type PodcastEntry } from "@/lib/store";
 import { upsertReviewItem } from "@/lib/review";
@@ -11,7 +11,8 @@ import { supabase } from "@/integrations/supabase/client";
 import StarRating from "@/components/StarRating";
 import { toast } from "sonner";
 
-const SectionCard = ({
+/* ---- Expandable section for people/concepts/events ---- */
+const ExpandableSection = ({
   icon: Icon,
   title,
   items,
@@ -60,6 +61,28 @@ const SectionCard = ({
   );
 };
 
+/* ---- Info card module ---- */
+const InfoCard = ({
+  icon: Icon,
+  title,
+  children,
+}: {
+  icon: React.ElementType;
+  title: string;
+  children: React.ReactNode;
+}) => (
+  <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
+    <div className="flex items-center gap-2 px-4 py-3 border-b border-border bg-muted/30">
+      <div className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center">
+        <Icon size={14} className="text-primary" />
+      </div>
+      <h3 className="text-xs font-bold uppercase tracking-wider text-foreground">{title}</h3>
+    </div>
+    <div className="px-4 py-4">{children}</div>
+  </div>
+);
+
+/* ---- AI Notes Section ---- */
 const AINotesSection = ({
   entry,
   onNotesUpdated,
@@ -197,7 +220,6 @@ const AINotesSection = ({
 
       {hasNotes && !editing && !generating && (
         <div className="bg-card border border-border rounded-2xl p-4 shadow-sm space-y-3">
-          {/* Key Ideas */}
           {(() => {
             const ideas = entry.notes!.keyIdeas || [];
             return ideas.length > 0 ? (
@@ -214,7 +236,6 @@ const AINotesSection = ({
               </div>
             ) : null;
           })()}
-          {/* Highlights */}
           {entry.notes!.highlights && entry.notes!.highlights.length > 0 && (
             <div>
               <p className="text-xs font-bold text-muted-foreground mb-1">✨ 高光语句</p>
@@ -225,12 +246,10 @@ const AINotesSection = ({
               </div>
             </div>
           )}
-          {/* Thoughts */}
           <div>
             <p className="text-xs font-bold text-muted-foreground mb-1">💭 我的思考</p>
             <p className="text-sm leading-relaxed">{entry.notes!.myThoughts || entry.notes!.thoughts}</p>
           </div>
-          {/* Action */}
           {entry.notes!.action && (
             <div>
               <p className="text-xs font-bold text-muted-foreground mb-1">🎯 行动计划</p>
@@ -242,29 +261,17 @@ const AINotesSection = ({
             <StarRating rating={entry.notes!.rating} onChange={() => {}} />
           </div>
           <div className="flex gap-2 pt-1">
-            <button
-              onClick={() => setEditing(true)}
-              className="flex-1 bg-muted text-foreground font-semibold py-2.5 rounded-xl flex items-center justify-center gap-1.5 text-sm transition-all hover:bg-muted/80"
-            >
+            <button onClick={() => setEditing(true)} className="flex-1 bg-muted text-foreground font-semibold py-2.5 rounded-xl flex items-center justify-center gap-1.5 text-sm transition-all hover:bg-muted/80">
               <Pencil size={14} /> 编辑
             </button>
-            <button
-              onClick={() => navigate(`/notes/${entry.id}`)}
-              className="flex-1 bg-muted text-foreground font-semibold py-2.5 rounded-xl flex items-center justify-center gap-1.5 text-sm transition-all hover:bg-muted/80"
-            >
+            <button onClick={() => navigate(`/notes/${entry.id}`)} className="flex-1 bg-muted text-foreground font-semibold py-2.5 rounded-xl flex items-center justify-center gap-1.5 text-sm transition-all hover:bg-muted/80">
               <Pencil size={14} /> 完整编辑
             </button>
-            <button
-              onClick={handleDelete}
-              className="bg-destructive/10 text-destructive font-semibold py-2.5 px-4 rounded-xl flex items-center justify-center gap-1.5 text-sm transition-all hover:bg-destructive/20"
-            >
+            <button onClick={handleDelete} className="bg-destructive/10 text-destructive font-semibold py-2.5 px-4 rounded-xl flex items-center justify-center gap-1.5 text-sm transition-all hover:bg-destructive/20">
               <Trash2 size={14} />
             </button>
           </div>
-          <button
-            onClick={handleGenerate}
-            className="w-full bg-primary/5 text-primary font-semibold py-2 rounded-xl flex items-center justify-center gap-1.5 text-xs transition-all hover:bg-primary/10"
-          >
+          <button onClick={handleGenerate} className="w-full bg-primary/5 text-primary font-semibold py-2 rounded-xl flex items-center justify-center gap-1.5 text-xs transition-all hover:bg-primary/10">
             <Sparkles size={12} /> 重新生成
           </button>
         </div>
@@ -306,6 +313,7 @@ const AINotesSection = ({
   );
 };
 
+/* ---- Preview Page (redesigned as info cards) ---- */
 const Preview = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -336,18 +344,14 @@ const Preview = () => {
   }
 
   const handleCopyPreview = async () => {
-    const sections = [`📻 ${entry.title}`, "", `⚡ 30秒速览`, entry.brief];
-    if (entry.background) sections.push("", `📖 背景知识`, entry.background);
+    const sections = [`📻 ${entry.title}`, "", `⚡ 一句话理解`, entry.brief];
+    if (entry.background) sections.push("", `📖 听之前可能需要知道`, entry.background);
     if (entry.listenGuide?.length) {
-      sections.push("", `❓ 带着问题去听`);
+      sections.push("", `👀 听的时候可以注意`);
       entry.listenGuide.forEach((q, i) => sections.push(`  ${i + 1}. ${q}`));
     }
-    if (entry.keyPeople?.length) {
-      sections.push("", `👤 关键人物`);
-      entry.keyPeople.forEach((p) => sections.push(`  • ${p.name}：${p.description}`));
-    }
     if (entry.keyConcepts?.length) {
-      sections.push("", `💡 核心概念`);
+      sections.push("", `💡 主要讨论`);
       entry.keyConcepts.forEach((c) => sections.push(`  • ${c.name}：${c.description}`));
     }
     sections.push("", `🔗 ${entry.url}`, "", "— via PodPrep");
@@ -373,59 +377,71 @@ const Preview = () => {
         </div>
       </div>
 
-      <div className="px-6 pt-6">
-        <h1 className="text-xl font-display font-extrabold mb-5">{entry.title}</h1>
+      <div className="px-5 pt-5 space-y-4">
+        {/* Title */}
+        <h1 className="text-xl font-display font-extrabold">{entry.title}</h1>
 
-        <div className="mb-5">
-          <div className="flex items-center gap-2 mb-2 px-1">
-            <div className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center">
-              <Info size={14} className="text-primary" />
-            </div>
-            <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground">30秒速览</p>
-          </div>
-          <div className="bg-card border border-border rounded-2xl p-4 shadow-sm">
-            <p className="text-sm leading-relaxed text-surface-foreground">{entry.brief}</p>
-          </div>
-        </div>
+        {/* Card 1: 一句话理解 */}
+        <InfoCard icon={Lightbulb} title="一句话理解这期播客">
+          <p className="text-sm leading-relaxed">{entry.brief}</p>
+        </InfoCard>
 
-        {entry.background && (
-          <div className="mb-5">
-            <div className="flex items-center gap-2 mb-2 px-1">
-              <div className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center">
-                <BookOpen size={14} className="text-primary" />
-              </div>
-              <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground">背景知识</p>
-            </div>
-            <div className="bg-card border border-border rounded-2xl p-4 shadow-sm">
-              <p className="text-sm leading-relaxed text-surface-foreground">{entry.background}</p>
-            </div>
-          </div>
-        )}
-
-        {entry.listenGuide && entry.listenGuide.length > 0 && (
-          <div className="mb-5">
-            <div className="flex items-center gap-2 mb-2 px-1">
-              <div className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center">
-                <HelpCircle size={14} className="text-primary" />
-              </div>
-              <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground">带着问题去听</p>
-            </div>
-            <div className="bg-card border border-border rounded-2xl p-4 space-y-2.5 shadow-sm">
-              {entry.listenGuide.map((q, i) => (
-                <div key={i} className="flex gap-3 items-start">
+        {/* Card 2: 听之前可能需要知道 */}
+        {entry.keyConcepts && entry.keyConcepts.length > 0 && (
+          <InfoCard icon={BookOpen} title="听之前可能需要知道">
+            <ul className="space-y-2.5">
+              {entry.keyConcepts.slice(0, 4).map((concept, i) => (
+                <li key={i} className="flex gap-2.5 items-start">
                   <span className="text-xs font-bold text-primary-foreground bg-primary rounded-full w-5 h-5 flex items-center justify-center shrink-0 mt-0.5">{i + 1}</span>
-                  <p className="text-sm leading-relaxed text-surface-foreground">{q}</p>
-                </div>
+                  <div>
+                    <span className="text-sm font-semibold">{concept.name}</span>
+                    <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{concept.description}</p>
+                  </div>
+                </li>
               ))}
-            </div>
-          </div>
+            </ul>
+          </InfoCard>
         )}
 
-        <SectionCard icon={User} title="关键人物" items={entry.keyPeople} />
-        <SectionCard icon={Lightbulb} title="核心概念" items={entry.keyConcepts} />
-        <SectionCard icon={Calendar} title="关键事件" items={entry.keyEvents} />
-        <SectionCard icon={MessageCircle} title="争议与观点" items={entry.controversies || []} />
-        <SectionCard icon={BookOpen} title="延伸阅读" items={entry.relatedResources || []} />
+        {/* Card 3: 主要讨论 */}
+        {entry.keyPeople && entry.keyPeople.length > 0 && (
+          <InfoCard icon={Target} title="主要讨论">
+            <ul className="space-y-2">
+              {entry.keyPeople.slice(0, 3).map((item, i) => (
+                <li key={i} className="flex gap-2.5 items-start text-sm">
+                  <span className="text-primary mt-0.5 shrink-0">•</span>
+                  <span className="leading-relaxed">{item.name}：{item.description}</span>
+                </li>
+              ))}
+            </ul>
+          </InfoCard>
+        )}
+
+        {/* Card 4: 听的时候可以注意 */}
+        {entry.listenGuide && entry.listenGuide.length > 0 && (
+          <InfoCard icon={Eye} title="听的时候可以注意">
+            <ul className="space-y-2">
+              {entry.listenGuide.slice(0, 2).map((q, i) => (
+                <li key={i} className="text-sm leading-relaxed flex gap-2 items-start">
+                  <span className="text-primary shrink-0 mt-0.5">👂</span>
+                  <span>{q}</span>
+                </li>
+              ))}
+            </ul>
+          </InfoCard>
+        )}
+
+        {/* Background - optional extra */}
+        {entry.background && (
+          <InfoCard icon={BookOpen} title="背景知识">
+            <p className="text-sm leading-relaxed">{entry.background}</p>
+          </InfoCard>
+        )}
+
+        {/* Detailed expandable sections */}
+        <ExpandableSection icon={Calendar} title="关键事件" items={entry.keyEvents} />
+        <ExpandableSection icon={MessageCircle} title="争议与观点" items={entry.controversies || []} />
+        <ExpandableSection icon={BookOpen} title="延伸阅读" items={entry.relatedResources || []} />
 
         <AINotesSection entry={entry} onNotesUpdated={setEntry} />
 

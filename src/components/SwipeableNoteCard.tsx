@@ -43,6 +43,14 @@ const SwipeableNoteCard = ({ entry, showShowName, onPin, onDelete }: Props) => {
   const pinOpacity = Math.min(1, Math.max(0, offsetX / THRESHOLD));
   const deleteOpacity = Math.min(1, Math.max(0, -offsetX / THRESHOLD));
 
+  // Count note items
+  const notes = entry.notes;
+  const noteCount =
+    (notes?.keyIdeas?.length || notes?.keyPoints?.length || 0) +
+    (notes?.highlights?.length || 0) +
+    (notes?.myThoughts || notes?.thoughts ? 1 : 0) +
+    (notes?.action ? 1 : 0);
+
   return (
     <div className="relative overflow-hidden rounded-2xl animate-fade-in">
       <div className="absolute inset-y-0 left-0 w-20 flex items-center justify-center bg-amber-500 rounded-l-2xl transition-opacity" style={{ opacity: pinOpacity }}>
@@ -78,8 +86,11 @@ const SwipeableNoteCard = ({ entry, showShowName, onPin, onDelete }: Props) => {
               )}
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground">{new Date(entry.createdAt).toLocaleDateString("zh-CN")}</span>
-              {entry.notes?.rating ? <StarRating rating={entry.notes.rating} size={14} /> : null}
+              <span className="text-xs text-muted-foreground">
+                {new Date(entry.createdAt).toLocaleDateString("zh-CN")}
+                {noteCount > 0 && ` · ${noteCount}条笔记`}
+              </span>
+              {notes?.rating ? <StarRating rating={notes.rating} size={14} /> : null}
             </div>
           </div>
           <ChevronRight size={16} className="text-muted-foreground shrink-0 ml-2" />

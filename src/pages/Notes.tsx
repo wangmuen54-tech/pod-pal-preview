@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Save, Copy, Share2, Lightbulb, Quote, Brain, Zap, Star } from "lucide-react";
+import { ArrowLeft, Save, Copy, Share2, Lightbulb, Quote, Brain, Zap, Star, Image } from "lucide-react";
 import { fetchEntry, saveEntryToDb, CATEGORIES, type PodcastCategory } from "@/lib/store";
 import { upsertReviewItem } from "@/lib/review";
 import StarRating from "@/components/StarRating";
@@ -40,7 +40,6 @@ const Notes = () => {
         setShowName(e.showName || "");
         setCategory(e.category || "");
         if (e.notes) {
-          // Support legacy fields migration
           if (e.notes.keyIdeas) {
             setKeyIdeas(e.notes.keyIdeas.join("\n"));
           } else if (e.notes.keyPoints) {
@@ -176,7 +175,6 @@ const Notes = () => {
             />
             <span className="text-xs text-muted-foreground/60">{dateStr}</span>
           </div>
-          {/* Category chips */}
           <div className="flex flex-wrap gap-1.5 mt-3">
             {CATEGORIES.map((cat) => (
               <button
@@ -257,13 +255,16 @@ const Notes = () => {
           <Save size={18} /> 保存笔记
         </button>
 
-        {/* Copy & Share */}
+        {/* Copy & Share & Knowledge Card */}
         <div className="flex gap-3">
           <button onClick={handleCopy} className="flex-1 bg-card border border-border text-foreground font-semibold py-3 rounded-2xl flex items-center justify-center gap-2 transition-all hover:shadow-md">
-            <Copy size={16} /> 复制文本
+            <Copy size={16} /> 复制
           </button>
           <button onClick={handleShare} className="flex-1 bg-card border border-border text-foreground font-semibold py-3 rounded-2xl flex items-center justify-center gap-2 transition-all hover:shadow-md">
             <Share2 size={16} /> 分享
+          </button>
+          <button onClick={() => toast.info("知识卡片功能即将上线")} className="flex-1 bg-card border border-dashed border-primary/30 text-primary font-semibold py-3 rounded-2xl flex items-center justify-center gap-2 transition-all hover:shadow-md hover:bg-primary/5">
+            <Image size={16} /> 卡片
           </button>
         </div>
       </div>
